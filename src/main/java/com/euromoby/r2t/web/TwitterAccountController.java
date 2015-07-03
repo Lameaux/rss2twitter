@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import twitter4j.TwitterException;
@@ -29,7 +30,7 @@ public class TwitterAccountController {
 	@Autowired
 	private Session session;
 
-	@RequestMapping(value = "/twitter/profile")
+	@RequestMapping(value = "/twitter/profile", method = RequestMethod.GET)
 	public String twitterProfile(ModelMap model) {
 		if (session.isNotAuthenticated()) {
 			return "redirect:/";
@@ -43,12 +44,12 @@ public class TwitterAccountController {
 		return "twitter_profile";
 	}
 
-	@RequestMapping(value = "twitter/error")
+	@RequestMapping(value = "twitter/error", method = RequestMethod.GET)
 	public String twitterError(ModelMap model) {
 		return "twitter_error";
 	}	
 	
-	@RequestMapping("/twitter/connect")
+	@RequestMapping(value = "/twitter/connect", method = RequestMethod.GET)
 	public String connectTwitterAccount(ModelMap model) {
 		try {
 			return "redirect:" + twitterProvider.getAuthorizationUrl();
@@ -58,7 +59,7 @@ public class TwitterAccountController {
 		}
 	}
 
-	@RequestMapping("/twitter/oauth")
+	@RequestMapping(value = "/twitter/oauth", method = RequestMethod.GET)
 	public String oAuthTwitterAccount(ModelMap model, @RequestParam("oauth_token") String oAuthToken, @RequestParam("oauth_verifier") String oAuthVerifier) {
 		try {
 			AccessToken accessToken = twitterProvider.getAccessToken(oAuthToken, oAuthVerifier);
