@@ -36,6 +36,11 @@ public class TwitterManager {
 	}
 
 	@Transactional(readOnly = true)
+	public List<TwitterRssFeed> findRssFeedsByScreenNameAndUrl(String screenName, String url) {
+		return twitterRssFeedDao.findAllByScreenNameAndUrl(screenName, url);
+	}	
+	
+	@Transactional(readOnly = true)
 	public List<TwitterRssFeed> findRssFeeds() {
 		return twitterRssFeedDao.findAll();
 	}

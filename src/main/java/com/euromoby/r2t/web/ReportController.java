@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.euromoby.r2t.core.twitter.TwitterManager;
 
 @Controller
-public class TwitterStatusLogController {
+public class ReportController {
 
 	@Autowired
 	private TwitterManager twitterManager;
@@ -16,14 +16,14 @@ public class TwitterStatusLogController {
 	@Autowired
 	private Session session;
 
-	@RequestMapping("/log")
-	public String statusLog(ModelMap model) {
+	@RequestMapping("/report")
+	public String report(ModelMap model) {
 
 		if (session.isNotAuthenticated()) {
 			return "redirect:/";
 		}
 
-		return "status_log";
+		return "report";
 	}
 
 }

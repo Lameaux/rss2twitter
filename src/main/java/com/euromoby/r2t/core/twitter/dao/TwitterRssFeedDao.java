@@ -45,6 +45,11 @@ public class TwitterRssFeedDao {
 		return jdbcTemplate.query("select * from twitter_rss_feed where screen_name = ? order by id", ROW_MAPPER, screenName);
 	}
 
+	public List<TwitterRssFeed> findAllByScreenNameAndUrl(String screenName, String url) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		return jdbcTemplate.query("select * from twitter_rss_feed where screen_name = ? and url = ? order by id", ROW_MAPPER, screenName, url);
+	}	
+	
 	public void save(TwitterRssFeed twitterRssFeed) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("insert into twitter_rss_feed(screen_name, url, updated) values (?,?,?)", twitterRssFeed.getScreenName(), twitterRssFeed.getUrl(),

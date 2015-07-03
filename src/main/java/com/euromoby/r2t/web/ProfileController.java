@@ -17,9 +17,9 @@ import com.euromoby.r2t.core.twitter.TwitterProvider;
 import com.euromoby.r2t.core.twitter.model.TwitterAccount;
 
 @Controller
-public class TwitterAccountController {
+public class ProfileController {
 
-	private static final Logger log = LoggerFactory.getLogger(TwitterAccountController.class);
+	private static final Logger log = LoggerFactory.getLogger(ProfileController.class);
 	
 	@Autowired
 	private TwitterManager twitterManager;
@@ -30,23 +30,29 @@ public class TwitterAccountController {
 	@Autowired
 	private Session session;
 
-	@RequestMapping(value = "/twitter/profile", method = RequestMethod.GET)
-	public String twitterProfile(ModelMap model) {
+	@RequestMapping(value = "/profile", method = RequestMethod.GET)
+	public String profile(ModelMap model) {
 		if (session.isNotAuthenticated()) {
 			return "redirect:/";
 		}
 		TwitterAccount twitterAccount = twitterManager.getAccountByScreenName(session.getScreenName());
 		if (twitterAccount == null) {
 			log.debug("account {} not found", session.getScreenName());
-			return "redirect:/twitter/error";
+			return "redirect:/error";
 		}
 		model.put("twitter", twitterAccount);
-		return "twitter_profile";
+		return "profile";
 	}
 
-	@RequestMapping(value = "twitter/error", method = RequestMethod.GET)
-	public String twitterError(ModelMap model) {
-		return "twitter_error";
+	@RequestMapping(value = "/error", method = RequestMethod.GET)
+	public String error(ModelMap model) {
+		return "error";
+	}	
+
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public String logout(ModelMap model) {
+		session.setScreenName(null);
+		return "redirect:/";
 	}	
 	
 	@RequestMapping(value = "/twitter/connect", method = RequestMethod.GET)
@@ -55,7 +61,7 @@ public class TwitterAccountController {
 			return "redirect:" + twitterProvider.getAuthorizationUrl();
 		} catch (TwitterException e) {
 			log.error("Error getting auth url", e);
-			return "redirect:/twitter/error";
+			return "redirect:/error";
 		}
 	}
 
@@ -65,10 +71,10 @@ public class TwitterAccountController {
 			AccessToken accessToken = twitterProvider.getAccessToken(oAuthToken, oAuthVerifier);
 			TwitterAccount twitterAccount = twitterManager.saveAccessToken(accessToken);
 			session.setScreenName(twitterAccount.getScreenName());
-			return "redirect:/twitter/profile";
+			return "redirect:/profile";
 		} catch (TwitterException e) {
 			log.debug("auth failed", e);
-			return "redirect:/twitter/error";
+			return "redirect:/error";
 		}
 	}
 
