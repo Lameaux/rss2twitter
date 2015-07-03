@@ -1,0 +1,60 @@
+<h1>Edit Twitter Group</h1>
+
+#springBind("group")
+<form method="post">
+
+#if($status.errors.hasErrors())
+<div class="alert alert-danger" role="alert">
+    ## Global error messages
+    #foreach($e in $status.errorMessages)
+        <p>${e}</p>
+    #end
+    ## Field error messages
+    #foreach($f in $status.errors.fieldErrors)
+        #springBind("group.${f.field}")
+        #foreach($e in $status.errorMessages)
+            <p>${e}</p>
+        #end
+    #end
+</div>    
+#end
+
+  <div class="form-group">
+    <label for="groupId">ID</label>
+    <input type="text" class="form-control" id="groupId" value="$group.id" disabled>
+    <input type="hidden" name="id" value="$group.id">    
+  </div>
+
+  <div class="form-group">
+    <label for="groupTitle">Title</label>
+	#springBind("group.title")    
+    <input type="text" class="form-control" id="groupTitle" name="${status.expression}" value="$!status.value">
+  </div>
+
+  <div class="form-group">
+    <label for="groupRss">RSS</label>
+	#springBind("group.rssUrl")    
+    <input type="text" class="form-control" id="groupRss" name="${status.expression}" value="$!status.value">
+  </div>
+
+  <div class="form-group">
+    <label>
+	#springBind("group.broadcastRss")    
+    <input type="checkbox" name="${status.expression}" value="true" #if("$!{status.value}"=="true") checked="checked"#end>
+    Broadcast RSS</label>
+  </div>
+
+
+<h2>Accounts</h2>  
+<ul class="list-group row">
+		#foreach($account in $accounts)
+		<tr>
+			<li  class="list-group-item col-xs-3"><label><input type="checkbox" name="accounts" #if($group.accounts.contains($account.id))checked#end value="${account.id}"> ${account.screenName}</label> <p>${account.description}</p></li>
+		</tr>
+		#end
+</ul> 
+  
+  
+  <button type="submit" class="btn btn-default">Update</button>
+  <a class="btn btn-default" href="/twitter/groups">Cancel</a>
+</form>

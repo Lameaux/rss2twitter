@@ -1,0 +1,29 @@
+<h1>Twitter Accounts</h1>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Screen name</th>
+			<th>Description</th>
+			<th>Groups</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		#foreach($twitter in $twitters)
+		<tr>
+			<td>${twitter.screenName}</td>
+			<td>${twitter.description}</td>
+			<td>
+			#foreach ($groupId in ${twitter.groups})
+				<a href="/twitter/groups/$groupId/edit"><span class="badge">$groups.get($groupId)</span></a> 
+			#end
+			</td>
+			<td>
+				<a href="/twitter/${twitter.screenName}/statistics" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Followers and Followings</a>
+				<a href="/twitter/${twitter.screenName}/tweets" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Last Tweets</a>
+				<a href="/twitter/${twitter.id}/profile" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Profile and Groups</a>
+			</td>
+		</tr>
+		#end
+	</tbody>
+</table>

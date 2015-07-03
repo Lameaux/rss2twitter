@@ -1,0 +1,61 @@
+<h1>Twitter Profile</h1>
+
+#springBind("twitter")
+<form method="post">
+
+#if($status.errors.hasErrors())
+<div class="alert alert-danger" role="alert">
+    ## Global error messages
+    #foreach($e in $status.errorMessages)
+        <p>${e}</p>
+    #end
+    ## Field error messages
+    #foreach($f in $status.errors.fieldErrors)
+        #springBind("twitter.${f.field}")
+        #foreach($e in $status.errorMessages)
+            <p>${e}</p>
+        #end
+    #end
+</div>    
+#end
+
+  <div class="form-group">
+    <label for="accountId">ID</label>
+    <input type="text" class="form-control" id="accountId" value="$twitter.id" disabled>
+    <input type="hidden" name="id" value="$twitter.id">    
+  </div>
+
+  <div class="form-group">
+    <label for="screenName">Screen name</label>
+    <input type="text" class="form-control" id="screenName" value="$twitter.screenName" disabled>
+    <input type="hidden" name="screenName" value="$twitter.screenName">
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <input type="text" class="form-control" id="description" name="description" value="$twitter.description">
+  </div>
+
+  <div class="form-group">
+    <label for="accessToken">accessToken</label>
+    <input type="text" class="form-control" id="accessToken" value="$twitter.accessToken" disabled>
+    <input type="hidden" name="accessToken" value="$twitter.accessToken">
+  </div>
+
+  <div class="form-group">
+    <label for="accessTokenSecret">accessTokenSecret</label>
+    <input type="text" class="form-control" id="accessTokenSecret" value="$twitter.accessTokenSecret" disabled>
+    <input type="hidden" name="accessTokenSecret" value="$twitter.accessTokenSecret">
+  </div>
+
+<h2>Groups</h2>
+
+<ul class="list-group row">
+		#foreach($group in $groups)
+		<li class="list-group-item col-xs-3"><label><input type="checkbox" name="groups" #if($twitter.groups.contains($group.id))checked#end value="${group.id}"> ${group.title}</label></li>
+		#end
+</ul>
+
+  <button type="submit" class="btn btn-default">Update</button>
+  <a class="btn btn-default" href="/twitter">Cancel</a>  
+</form>
