@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS twitter_rss_feed (
 	screen_name VARCHAR(20),
 	url VARCHAR(255),
 	frequency INT,
+	status INT DEFAULT 0,
+	error_text TEXT,	
 	updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP	
 ) ENGINE=InnoDB;
 
@@ -24,7 +26,7 @@ CREATE TABLE IF NOT EXISTS twitter_status_log (
 	screen_name VARCHAR(20),
 	url VARCHAR(255),	
 	message VARCHAR(140),
-	status INT DEFAULT 0,
+	status INT DEFAULT 1,
 	error_text TEXT,
 	updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;

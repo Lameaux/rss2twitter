@@ -69,8 +69,8 @@ public class TwitterRssFeedDao {
 
 	public void update(TwitterRssFeed twitterRssFeed) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.update("update twitter_rss_feed set screen_name = ?, url=?, frequency=?, updated=? where id = ?", twitterRssFeed.getScreenName(),
-				twitterRssFeed.getUrl(), twitterRssFeed.getFrequency(), new Timestamp(twitterRssFeed.getUpdated()), twitterRssFeed.getId());
+		jdbcTemplate.update("update twitter_rss_feed set screen_name = ?, url=?, frequency=?, status=?, error_text=?, updated=? where id = ?", twitterRssFeed.getScreenName(),
+				twitterRssFeed.getUrl(), twitterRssFeed.getFrequency(), twitterRssFeed.getStatus(), twitterRssFeed.getErrorText(), new Timestamp(twitterRssFeed.getUpdated()), twitterRssFeed.getId());
 	}
 
 	public void delete(TwitterRssFeed twitterRssFeed) {
@@ -86,6 +86,8 @@ public class TwitterRssFeedDao {
 			twitterRssFeed.setScreenName(rs.getString("screen_name"));
 			twitterRssFeed.setUrl(rs.getString("url"));
 			twitterRssFeed.setFrequency(rs.getInt("frequency"));
+			twitterRssFeed.setStatus(rs.getInt("status"));
+			twitterRssFeed.setErrorText(rs.getString("error_text"));
 			twitterRssFeed.setUpdated(rs.getTimestamp("updated").getTime());
 			return twitterRssFeed;
 		}

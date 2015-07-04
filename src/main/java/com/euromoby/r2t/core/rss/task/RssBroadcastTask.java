@@ -65,9 +65,18 @@ public class RssBroadcastTask {
 				RSSFeedParser rssParser = new RSSFeedParser();
 				Feed feed = rssParser.readFeed(rssContent);
 				if (feed == null) {
+					rssFeed.setStatus(TwitterRssFeed.STATUS_ERROR);
+					rssFeed.setErrorText(null);
+					twitterManager.updateRssFeed(rssFeed);					
 					log.error("Error parsing feed {}", rssFeed.getUrl());
 					continue;
 				}
+				
+				// feed loaded
+				rssFeed.setStatus(TwitterRssFeed.STATUS_OK);
+				rssFeed.setErrorText(null);
+				twitterManager.updateRssFeed(rssFeed);				
+				
 				List<FeedMessage> feedMessages = feed.getMessages();
 				if (feedMessages.isEmpty()) {
 					continue;
@@ -78,11 +87,9 @@ public class RssBroadcastTask {
 				if (StringUtils.nullOrEmpty(feedMessage.getLink()) || StringUtils.nullOrEmpty(feedMessage.getTitle())) {
 					continue;
 				}
-
 				if (twitterManager.alreadySent(rssFeed.getScreenName(), feedMessage.getLink())) {
 					continue;
 				}
-
 				TwitterAccount twitterAccount = twitterManager.getAccountByScreenName(rssFeed.getScreenName());
 				String statusText = createTweetText(feedMessage);
 
@@ -101,11 +108,14 @@ public class RssBroadcastTask {
 					twitterStatusLog.setErrorText(e.getErrorMessage());
 				}
 				twitterManager.saveStatusLog(twitterStatusLog);
+				
 			} catch (Exception e) {
+				rssFeed.setStatus(TwitterRssFeed.STATUS_ERROR);
+				rssFeed.setErrorText(e.getMessage());
+				twitterManager.updateRssFeed(rssFeed);
 				log.error("Error processing RSS " + rssFeed.getUrl(), e);
 				continue;
 			}
-
 		}
 	}
 
