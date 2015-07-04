@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS twitter_rss_feed (
 	id INT auto_increment PRIMARY KEY, 
 	screen_name VARCHAR(20),
 	url VARCHAR(255),
+	frequency INT,
 	updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP	
 ) ENGINE=InnoDB;
 

@@ -2,6 +2,7 @@ package com.euromoby.r2t.core.twitter.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -49,17 +50,27 @@ public class TwitterRssFeedDao {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		return jdbcTemplate.query("select * from twitter_rss_feed where screen_name = ? and url = ? order by id", ROW_MAPPER, screenName, url);
 	}	
+
+	public TwitterRssFeed findByScreenNameAndId(String screenName, Integer id) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		try {
+			return jdbcTemplate.queryForObject("select * from twitter_rss_feed where screen_name = ? and id = ?", ROW_MAPPER, screenName, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+	}	
 	
 	public void save(TwitterRssFeed twitterRssFeed) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.update("insert into twitter_rss_feed(screen_name, url, updated) values (?,?,?)", twitterRssFeed.getScreenName(), twitterRssFeed.getUrl(),
-				twitterRssFeed.getUpdated());
+		jdbcTemplate.update("insert into twitter_rss_feed(screen_name, url, frequency, updated) values (?,?,?,?)", twitterRssFeed.getScreenName(), 
+				twitterRssFeed.getUrl(), twitterRssFeed.getFrequency(),
+				new Timestamp(twitterRssFeed.getUpdated()));
 	}
 
 	public void update(TwitterRssFeed twitterRssFeed) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.update("update twitter_rss_feed set screen_name = ?, url=?, updated=? where id = ?", twitterRssFeed.getScreenName(),
-				twitterRssFeed.getUrl(), twitterRssFeed.getUpdated(), twitterRssFeed.getId());
+		jdbcTemplate.update("update twitter_rss_feed set screen_name = ?, url=?, frequency=?, updated=? where id = ?", twitterRssFeed.getScreenName(),
+				twitterRssFeed.getUrl(), twitterRssFeed.getFrequency(), new Timestamp(twitterRssFeed.getUpdated()), twitterRssFeed.getId());
 	}
 
 	public void delete(TwitterRssFeed twitterRssFeed) {
@@ -74,7 +85,8 @@ public class TwitterRssFeedDao {
 			twitterRssFeed.setId(rs.getInt("id"));
 			twitterRssFeed.setScreenName(rs.getString("screen_name"));
 			twitterRssFeed.setUrl(rs.getString("url"));
-			twitterRssFeed.setUpdated(rs.getDate("updated"));
+			twitterRssFeed.setFrequency(rs.getInt("frequency"));
+			twitterRssFeed.setUpdated(rs.getTimestamp("updated").getTime());
 			return twitterRssFeed;
 		}
 	}

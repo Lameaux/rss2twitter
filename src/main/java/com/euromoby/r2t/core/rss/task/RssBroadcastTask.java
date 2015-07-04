@@ -1,6 +1,5 @@
 package com.euromoby.r2t.core.rss.task;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -13,6 +12,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import twitter4j.Status;
@@ -35,6 +35,8 @@ public class RssBroadcastTask {
 	private static final Logger log = LoggerFactory.getLogger(RssBroadcastTask.class);
 
 	public static final int TWITTER_LIMIT = 140;
+	public static final int HOUR_MICRO = 3600000;
+	
 
 	@Autowired
 	private TwitterManager twitterManager;
@@ -43,17 +45,29 @@ public class RssBroadcastTask {
 	@Autowired
 	private HttpClientProvider httpClientProvider;
 
-	// @Scheduled(fixedDelay = 5000) // 600000
+	@Scheduled(fixedDelay = 5000) // 3600000 // = 1 hour
 	public void execute() {
-		// TODO check last updated
 		List<TwitterRssFeed> rssFeeds = twitterManager.findRssFeeds();
 		for (TwitterRssFeed rssFeed : rssFeeds) {
 
+			long nextUpdate = rssFeed.getUpdated() + rssFeed.getFrequency() * HOUR_MICRO;
+			if (nextUpdate > System.currentTimeMillis()) {
+				continue;
+			}
+
+			// update last update
+			rssFeed.setUpdated(System.currentTimeMillis());
+			twitterManager.updateRssFeed(rssFeed);			
+			
 			try {
 				String rssContent = loadUrl(rssFeed.getUrl());
 
 				RSSFeedParser rssParser = new RSSFeedParser();
 				Feed feed = rssParser.readFeed(rssContent);
+				if (feed == null) {
+					log.error("Error parsing feed {}", rssFeed.getUrl());
+					continue;
+				}
 				List<FeedMessage> feedMessages = feed.getMessages();
 				if (feedMessages.isEmpty()) {
 					continue;
@@ -76,7 +90,7 @@ public class RssBroadcastTask {
 				twitterStatusLog.setScreenName(twitterAccount.getScreenName());
 				twitterStatusLog.setUrl(feedMessage.getLink());
 				twitterStatusLog.setMessage(statusText);
-				twitterStatusLog.setUpdated(new Date());
+				twitterStatusLog.setUpdated(System.currentTimeMillis());
 				twitterStatusLog.setStatus(TwitterStatusLog.STATUS_OK);
 
 				try {
@@ -86,9 +100,7 @@ public class RssBroadcastTask {
 					twitterStatusLog.setStatus(TwitterStatusLog.STATUS_ERROR);
 					twitterStatusLog.setErrorText(e.getErrorMessage());
 				}
-
 				twitterManager.saveStatusLog(twitterStatusLog);
-
 			} catch (Exception e) {
 				log.error("Error processing RSS " + rssFeed.getUrl(), e);
 				continue;

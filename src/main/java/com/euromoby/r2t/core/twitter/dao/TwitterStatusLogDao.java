@@ -2,6 +2,7 @@ package com.euromoby.r2t.core.twitter.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -39,8 +40,8 @@ public class TwitterStatusLogDao {
 	
 	public void save(TwitterStatusLog twitterStatusLog) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.update("insert into twitter_status_log(screen_name, message, status, updated) values (?,?,?,?)", 
-				twitterStatusLog.getScreenName(), twitterStatusLog.getMessage(), twitterStatusLog.getStatus(), twitterStatusLog.getUpdated());
+		jdbcTemplate.update("insert into twitter_status_log(screen_name, url, message, status, updated) values (?,?,?,?,?)", 
+				twitterStatusLog.getScreenName(), twitterStatusLog.getUrl(), twitterStatusLog.getMessage(), twitterStatusLog.getStatus(), new Timestamp(twitterStatusLog.getUpdated()));
 	}
 
 	static class TwitterStatusLogRowMapper implements RowMapper<TwitterStatusLog> {
@@ -53,7 +54,7 @@ public class TwitterStatusLogDao {
 			twitterStatusLog.setMessage(rs.getString("message"));
 			twitterStatusLog.setStatus(rs.getInt("status"));
 			twitterStatusLog.setErrorText(rs.getString("error_text"));
-			twitterStatusLog.setUpdated(rs.getDate("updated"));			
+			twitterStatusLog.setUpdated(rs.getTimestamp("updated").getTime());			
 			return twitterStatusLog;
 		}
 	}

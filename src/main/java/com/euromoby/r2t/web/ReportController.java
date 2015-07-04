@@ -1,11 +1,13 @@
 package com.euromoby.r2t.web;
 
+import org.apache.velocity.tools.generic.EscapeTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.euromoby.r2t.core.twitter.TwitterManager;
+import com.euromoby.r2t.core.utils.DateUtils;
 
 @Controller
 public class ReportController {
@@ -18,11 +20,12 @@ public class ReportController {
 
 	@RequestMapping("/report")
 	public String report(ModelMap model) {
-
 		if (session.isNotAuthenticated()) {
 			return "redirect:/";
 		}
-
+		model.put("actions", twitterManager.findStatusLogsByScreenName(session.getScreenName()));
+		model.put("escape", new EscapeTool());
+		model.put("date", new DateUtils());
 		return "report";
 	}
 

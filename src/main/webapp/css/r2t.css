@@ -1,3 +1,8 @@
+.feed-edit, .feed-delete {
+	cursor: pointer;
+}
+
+
 
 /*
  * Base structure

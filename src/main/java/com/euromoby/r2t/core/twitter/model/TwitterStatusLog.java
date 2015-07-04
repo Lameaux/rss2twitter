@@ -1,6 +1,5 @@
 package com.euromoby.r2t.core.twitter.model;
 
-import java.util.Date;
 
 public class TwitterStatusLog {
 
@@ -13,7 +12,7 @@ public class TwitterStatusLog {
 	private String url;
 	private int status = STATUS_OK;
 	private String errorText;
-	private Date updated;
+	private long updated;
 
 	public Integer getId() {
 		return id;
@@ -63,11 +62,11 @@ public class TwitterStatusLog {
 		this.errorText = errorText;
 	}
 
-	public Date getUpdated() {
+	public long getUpdated() {
 		return updated;
 	}
 
-	public void setUpdated(Date updated) {
+	public void setUpdated(long updated) {
 		this.updated = updated;
 	}
 

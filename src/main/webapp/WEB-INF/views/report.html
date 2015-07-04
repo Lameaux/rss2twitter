@@ -1,35 +1,24 @@
-<h1>Status Updates</h1>
+<h1>Report</h1>
 <table class="table table-striped">
 	<thead>
 		<tr>
-			<th>ID</th>
-			<th>User</th>
+			<th>Date</th>
 			<th>Message</th>
 			<th>Status</th>			
-			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		#foreach($action in $actions)
 		<tr>
-			<td>${action.id}</td>
-			<td>${action.screenName}</td>
+			<td>$date.format($action.updated)</td>
 			<td>$escape.html($action.message)</td>
 			<td>
-			#if ($action.status == 0)
-				<span class="label label-primary">NEW</span> 
-			#end
-			#if ($action.status == 1)
-				<span class="label label-success">OK</span> 
-			#end
-			#if ($action.status == 2)
-				<span class="label label-danger">ERROR</span> 
-				$!{action.errorText}
-			#end			
-			</td>
-			<td>
-				<a href="/twitter/${action.screenName}/tweets" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Last Tweets</a>
-				<a href="/statuses/${action.id}/delete" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete action</a>
+				#if ($action.status == 1)
+					<span class="label label-success">OK</span> 
+				#end
+				#if ($action.status == 2)
+					<span class="label label-danger">ERROR</span> 
+				#end			
 			</td>
 		</tr>
 		#end

@@ -1,12 +1,12 @@
 package com.euromoby.r2t.core.twitter.model;
 
-import java.util.Date;
 
 public class TwitterRssFeed {
 	private Integer id;
 	private String screenName;
 	private String url;
-	private Date updated;
+	private int frequency;
+	private long updated;
 
 	public Integer getId() {
 		return id;
@@ -32,11 +32,19 @@ public class TwitterRssFeed {
 		this.url = url;
 	}
 
-	public Date getUpdated() {
+	public int getFrequency() {
+		return frequency;
+	}
+
+	public void setFrequency(int frequency) {
+		this.frequency = frequency;
+	}
+
+	public long getUpdated() {
 		return updated;
 	}
 
-	public void setUpdated(Date updated) {
+	public void setUpdated(long updated) {
 		this.updated = updated;
 	}
 
