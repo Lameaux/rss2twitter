@@ -66,7 +66,7 @@ public class RssBroadcastTask {
 				Feed feed = rssParser.readFeed(rssContent);
 				if (feed == null) {
 					rssFeed.setStatus(TwitterRssFeed.STATUS_ERROR);
-					rssFeed.setErrorText(null);
+					rssFeed.setErrorText("Error parsing feed " + rssFeed.getUrl());
 					twitterManager.updateRssFeed(rssFeed);					
 					log.error("Error parsing feed {}", rssFeed.getUrl());
 					continue;
@@ -105,7 +105,7 @@ public class RssBroadcastTask {
 					log.debug("{} updated status {}", twitterAccount.getScreenName(), status.getId());
 				} catch (TwitterException e) {
 					twitterStatusLog.setStatus(TwitterStatusLog.STATUS_ERROR);
-					twitterStatusLog.setErrorText(e.getErrorMessage());
+					twitterStatusLog.setErrorText(e.getMessage());
 				}
 				twitterManager.saveStatusLog(twitterStatusLog);
 				

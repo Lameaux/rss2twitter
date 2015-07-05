@@ -1,4 +1,4 @@
-<h1>Report</h1>
+<h1><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Report</h1>
 <table class="table table-striped">
 	<thead>
 		<tr>
@@ -10,7 +10,7 @@
 	<tbody>
 		#foreach($action in $actions)
 		<tr>
-			<td>$date.format($action.updated)</td>
+			<td>$date.toGMT($action.updated)</td>
 			<td>$escape.html($action.message)</td>
 			<td>
 				#if ($action.status == 1)

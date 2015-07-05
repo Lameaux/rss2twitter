@@ -1,4 +1,4 @@
-<h1>$twitter.screenName</h1>
+<h1><span class="glyphicon glyphicon-user" aria-hidden="true"></span> $twitter.screenName</h1>
 
 <div id="rss_list">
 </div>
@@ -6,7 +6,14 @@
 <div id="add_rss_form">
 	<div id="add_rss_error" class="alert alert-danger hidden" role="alert"></div>
 	Feed URL: <input type="text" class="input-feed-url" id="rss_url" name="rss_url" value="http://" />, 
-	update every <input type="text" class="input-feed-frequency" id="rss_frequency" name="rss_frequency" value="1" /> hour(s)
-	<button id="add_rss_url" class="btn btn-success btn-xs">Add</button>
+	update every 
+	<select class="select-feed-frequency" id="rss_frequency" name="rss_frequency">
+		<option value="24">24 hours</option>
+		<option value="12">12 hours</option>
+		<option value="6">6 hours</option>
+		<option value="3">3 hours</option>
+		<option value="1">1 hour</option>
+	</select> 
+	<button id="add_rss_url" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-plus"></span> Add new RSS feed</button>
 </div>
 

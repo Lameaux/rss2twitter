@@ -100,7 +100,7 @@ function loadRssFeeds() {
 			
 			var updated_iso = new Date( feeds[i].updated ).toISOString();
 			var updated_text = updated_iso.replace('T', ' ').replace(/.[0-9]{3}Z/, '');
-			feed_tr = feed_tr + '<td class="feed-updated">' + updated_text + '</td>';
+			feed_tr = feed_tr + '<td class="feed-updated">' + updated_text + ' GMT</td>';
 			feed_tr = feed_tr + '<td class="feed-action">';			
 			feed_tr = feed_tr + '<button class="feed-edit btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</button> ';
 			feed_tr = feed_tr + '<button class="feed-delete btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</button>';
@@ -146,7 +146,7 @@ function loadRssFeeds() {
 				return;
 			}
 
-			var rssFrequency = $('input#rss_frequency').val();			
+			var rssFrequency = $('select#rss_frequency').val();			
 			if (!numberPattern.test(rssFrequency) || parseInt(rssFrequency) < 1) {
 				$('#add_rss_error').removeClass('hidden');
 				$('#add_rss_error').html('Update frequency should be at least 1 hour');
