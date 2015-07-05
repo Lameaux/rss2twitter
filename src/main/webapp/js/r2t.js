@@ -71,15 +71,8 @@ function loadRssFeeds() {
 		dataType: 'json'
 	}).done(function(feeds){
 		$('#rss_list').html('');
-		var feed_list = '<table class="table table-striped">';
-		feed_list = feed_list + '<tr>';
-		feed_list = feed_list + '<th>Feed URL</th>';
-		feed_list = feed_list + '<th>Update Interval</th>';
-		feed_list = feed_list + '<th>Status</th>';
-		feed_list = feed_list + '<th>Last Update</th>';
-		feed_list = feed_list + '<th>Action</th>';
-		feed_list = feed_list + '</tr>';
 		
+		var feed_list = '';
 		for (var i = 0; i < feeds.length; i++) {
 			var feed_tr = '';
 			feed_tr = feed_tr + '<tr id="feed-'+ feeds[i].id +'">';
@@ -110,8 +103,7 @@ function loadRssFeeds() {
 			feed_list = feed_list + feed_tr;
 		}
 		
-		feed_list = feed_list + '</table>';		
-		$('#rss_list').append(feed_list);		
+		$('#rss_list').html(feed_list);		
 		
 		$('.feed-delete').click(function(){
 			var feed_id = $(this).parent().parent().attr('id').split("-")[1];
