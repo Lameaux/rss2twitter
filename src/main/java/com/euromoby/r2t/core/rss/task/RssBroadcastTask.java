@@ -128,7 +128,7 @@ public class RssBroadcastTask {
 				}
 				twitterManager.saveStatusLog(twitterStatusLog);					
 				// break after first message
-				break;
+				// break;
 			}
 			updateOkStatus(twitterRssFeed);
 		}

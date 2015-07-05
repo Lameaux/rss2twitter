@@ -66,7 +66,6 @@ function makeFeedDeletable(feed_object) {
 	
 }	
 	
-
 function makeFeedEditable(feed_object) {
 	feed_object.addClass('info');
 	
@@ -99,10 +98,31 @@ function makeFeedEditable(feed_object) {
 	);	
 
 	feed_object.find('button.feed-save').click(function(){
-		makeFeedText(feed_object);
+		var feedUrlNew = feed_object.find('.input-feed-url').val();
+		var feedFrequencyNew = feed_object.find('.select-feed-frequency').val();
+		$.ajax({
+			type : 'POST',
+			url : '/feeds/' + feed_id + '/edit',
+			data : {
+				url : feedUrlNew,
+				frequency : feedFrequencyNew
+			}			
+		}).done(function(status){
+			if (status == '0') {
+				feed_object.find('.feed-status').html('<span class="label label-primary">NEW</span>');
+				feed_object.find('.feed-updated').html('');
+			}
+			makeFeedText(feed_object);
+		}).fail(function(){
+			$('#add_rss_error').removeClass('hidden');
+			$('#add_rss_error').html('Unknown Server Error');
+			restoreActionButtons(feed_object);
+		});			
 	});	
 	
 	feed_object.find('button.feed-cancel').click(function(){
+		feed_object.find('.input-feed-url').val(feedUrl);
+		feed_object.find('.select-feed-frequency').val(feedFrequency);
 		makeFeedText(feed_object);
 	});
 	

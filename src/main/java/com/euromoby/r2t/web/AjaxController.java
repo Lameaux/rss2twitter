@@ -61,7 +61,6 @@ public class AjaxController {
 	@RequestMapping(value = "/feeds/{id}/delete", method = RequestMethod.POST)
 	public @ResponseBody
 	Integer deleteFeed(ModelMap model, @PathVariable("id") Integer id) {
-
 		if (session.isNotAuthenticated()) {
 			throw new BadRequestException();
 		}
@@ -73,4 +72,25 @@ public class AjaxController {
 		return id;
 	}
 
+	@RequestMapping(value = "/feeds/{id}/edit", method = RequestMethod.POST)
+	public @ResponseBody
+	Integer editFeed(@Valid @ModelAttribute("rss_feed") RssFeed rssFeed, BindingResult result, @PathVariable("id") Integer id, ModelMap model) {
+		if (session.isNotAuthenticated() || result.hasErrors()) {
+			throw new BadRequestException();
+		}
+		TwitterRssFeed twitterRssFeed = twitterManager.findRssFeedsByScreenNameAndId(session.getScreenName(), id);
+		if (twitterRssFeed == null) {
+			throw new ResourceNotFoundException();
+		}		
+		if (!twitterRssFeed.getUrl().equals(rssFeed.getUrl())) {
+			twitterRssFeed.setUpdated(0);
+			twitterRssFeed.setStatus(TwitterRssFeed.STATUS_NEW);
+			twitterRssFeed.setErrorText(null);
+		}
+		twitterRssFeed.setUrl(rssFeed.getUrl());
+		twitterRssFeed.setFrequency(rssFeed.getFrequency());
+		twitterManager.updateRssFeed(twitterRssFeed);
+		return twitterRssFeed.getStatus();
+	}	
+	
 }
