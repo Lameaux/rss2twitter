@@ -56,6 +56,11 @@ public class TwitterManager {
 		return twitterStatusLogDao.findAllByScreenName(screenName);
 	}
 
+	@Transactional(readOnly = true)
+	public List<TwitterStatusLog> findOkStatusLogsByScreenName(String screenName) {
+		return twitterStatusLogDao.findAllOkByScreenName(screenName);
+	}	
+	
 	@Transactional(readOnly = true)	
 	public boolean alreadySent(String screenName, String url) {
 		return twitterStatusLogDao.findAllByScreenNameAndUrl(screenName, url).size() > 0;

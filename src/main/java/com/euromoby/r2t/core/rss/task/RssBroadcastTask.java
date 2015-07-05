@@ -1,5 +1,6 @@
 package com.euromoby.r2t.core.rss.task;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -45,61 +46,79 @@ public class RssBroadcastTask {
 	@Autowired
 	private HttpClientProvider httpClientProvider;
 
+	private void updateErrorStatus(TwitterRssFeed twitterRssFeed, String errorText) {
+		twitterRssFeed.setStatus(TwitterRssFeed.STATUS_ERROR);
+		twitterRssFeed.setErrorText(errorText);		
+		twitterRssFeed.setUpdated(System.currentTimeMillis());
+		twitterManager.updateRssFeed(twitterRssFeed);			
+	}
+
+	private void updateOkStatus(TwitterRssFeed twitterRssFeed) {
+		twitterRssFeed.setStatus(TwitterRssFeed.STATUS_OK);
+		twitterRssFeed.setErrorText(null);
+		twitterRssFeed.setUpdated(System.currentTimeMillis());
+		twitterManager.updateRssFeed(twitterRssFeed);			
+	}	
+	
 	@Scheduled(fixedDelay = 5000) // 3600000 // = 1 hour
 	public void execute() {
-		List<TwitterRssFeed> rssFeeds = twitterManager.findRssFeeds();
-		for (TwitterRssFeed rssFeed : rssFeeds) {
+		List<TwitterRssFeed> twitterRssFeeds = twitterManager.findRssFeeds();
+		for (TwitterRssFeed twitterRssFeed : twitterRssFeeds) {
 
-			long nextUpdate = rssFeed.getUpdated() + rssFeed.getFrequency() * HOUR_MICRO;
+			long nextUpdate = twitterRssFeed.getUpdated() + twitterRssFeed.getFrequency() * HOUR_MICRO;
 			if (nextUpdate > System.currentTimeMillis()) {
 				continue;
 			}
 
-			// update last update
-			rssFeed.setUpdated(System.currentTimeMillis());
-			twitterManager.updateRssFeed(rssFeed);			
-			
+			Feed feed = null;
 			try {
-				String rssContent = loadUrl(rssFeed.getUrl());
-
+				String rssContent = loadUrl(twitterRssFeed.getUrl());
 				RSSFeedParser rssParser = new RSSFeedParser();
-				Feed feed = rssParser.readFeed(rssContent);
-				if (feed == null) {
-					rssFeed.setStatus(TwitterRssFeed.STATUS_ERROR);
-					rssFeed.setErrorText("Error parsing feed " + rssFeed.getUrl());
-					twitterManager.updateRssFeed(rssFeed);					
-					log.error("Error parsing feed {}", rssFeed.getUrl());
-					continue;
-				}
-				
-				// feed loaded
-				rssFeed.setStatus(TwitterRssFeed.STATUS_OK);
-				rssFeed.setErrorText(null);
-				twitterManager.updateRssFeed(rssFeed);				
-				
-				List<FeedMessage> feedMessages = feed.getMessages();
-				if (feedMessages.isEmpty()) {
-					continue;
-				}
+				feed = rssParser.readFeed(rssContent);				
+			} catch (IOException io) {
+				String message = "URL is unavailable";
+				log.error(message + " {}", twitterRssFeed.getUrl());
+				updateErrorStatus(twitterRssFeed, message);
+				continue;
+			} catch (Exception e) {
+				String message = "Invalid format";
+				log.error(message + " {}", twitterRssFeed.getUrl());
+				updateErrorStatus(twitterRssFeed, message);
+				continue;
+			}
 
-				// get last message
-				FeedMessage feedMessage = feedMessages.get(0);
+			if (feed == null) {
+				String message = "Invalid format";
+				log.error(message + " {}", twitterRssFeed.getUrl());
+				updateErrorStatus(twitterRssFeed, message);
+				continue;
+			}			
+
+			List<FeedMessage> feedMessages = feed.getMessages();
+			if (feedMessages.isEmpty()) {
+				updateOkStatus(twitterRssFeed);
+				continue;
+			}
+
+			TwitterAccount twitterAccount = twitterManager.getAccountByScreenName(twitterRssFeed.getScreenName());
+			
+			for (FeedMessage feedMessage : feedMessages) {
 				if (StringUtils.nullOrEmpty(feedMessage.getLink()) || StringUtils.nullOrEmpty(feedMessage.getTitle())) {
 					continue;
 				}
-				if (twitterManager.alreadySent(rssFeed.getScreenName(), feedMessage.getLink())) {
+				if (twitterManager.alreadySent(twitterRssFeed.getScreenName(), feedMessage.getLink())) {
 					continue;
-				}
-				TwitterAccount twitterAccount = twitterManager.getAccountByScreenName(rssFeed.getScreenName());
+				}				
+				
 				String statusText = createTweetText(feedMessage);
-
+				
 				TwitterStatusLog twitterStatusLog = new TwitterStatusLog();
 				twitterStatusLog.setScreenName(twitterAccount.getScreenName());
 				twitterStatusLog.setUrl(feedMessage.getLink());
 				twitterStatusLog.setMessage(statusText);
 				twitterStatusLog.setUpdated(System.currentTimeMillis());
-				twitterStatusLog.setStatus(TwitterStatusLog.STATUS_OK);
-
+				twitterStatusLog.setStatus(TwitterStatusLog.STATUS_OK);	
+				
 				try {
 					Status status = twitterProvider.status(twitterAccount, statusText);
 					log.debug("{} updated status {}", twitterAccount.getScreenName(), status.getId());
@@ -107,19 +126,15 @@ public class RssBroadcastTask {
 					twitterStatusLog.setStatus(TwitterStatusLog.STATUS_ERROR);
 					twitterStatusLog.setErrorText(e.getMessage());
 				}
-				twitterManager.saveStatusLog(twitterStatusLog);
-				
-			} catch (Exception e) {
-				rssFeed.setStatus(TwitterRssFeed.STATUS_ERROR);
-				rssFeed.setErrorText(e.getMessage());
-				twitterManager.updateRssFeed(rssFeed);
-				log.error("Error processing RSS " + rssFeed.getUrl(), e);
-				continue;
+				twitterManager.saveStatusLog(twitterStatusLog);					
+				// break after first message
+				break;
 			}
+			updateOkStatus(twitterRssFeed);
 		}
 	}
 
-	private String loadUrl(String url) throws Exception {
+	private String loadUrl(String url) throws IOException {
 
 		HttpGet request = new HttpGet(url);
 		RequestConfig.Builder requestConfigBuilder = httpClientProvider.createRequestConfigBuilder();
@@ -129,7 +144,7 @@ public class RssBroadcastTask {
 			StatusLine statusLine = response.getStatusLine();
 			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
 				EntityUtils.consumeQuietly(response.getEntity());
-				throw new Exception(statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
+				throw new IOException(statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
 			}
 
 			HttpEntity entity = response.getEntity();

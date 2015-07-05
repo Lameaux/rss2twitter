@@ -2,7 +2,6 @@ package com.euromoby.r2t.core.twitter.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -32,6 +31,11 @@ public class TwitterStatusLogDao {
 		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? order by id desc", ROW_MAPPER, screenName);
 	}
 
+	public List<TwitterStatusLog> findAllOkByScreenName(String screenName) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? and status = ? order by id desc limit 50", ROW_MAPPER, screenName, TwitterStatusLog.STATUS_OK);
+	}	
+	
 	public List<TwitterStatusLog> findAllByScreenNameAndUrl(String screenName, String url) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? and url = ?", ROW_MAPPER, screenName, url);
@@ -41,7 +45,7 @@ public class TwitterStatusLogDao {
 	public void save(TwitterStatusLog twitterStatusLog) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("insert into twitter_status_log(screen_name, url, message, status, updated) values (?,?,?,?,?)", 
-				twitterStatusLog.getScreenName(), twitterStatusLog.getUrl(), twitterStatusLog.getMessage(), twitterStatusLog.getStatus(), new Timestamp(twitterStatusLog.getUpdated()));
+				twitterStatusLog.getScreenName(), twitterStatusLog.getUrl(), twitterStatusLog.getMessage(), twitterStatusLog.getStatus(), twitterStatusLog.getUpdated());
 	}
 
 	static class TwitterStatusLogRowMapper implements RowMapper<TwitterStatusLog> {
@@ -54,7 +58,7 @@ public class TwitterStatusLogDao {
 			twitterStatusLog.setMessage(rs.getString("message"));
 			twitterStatusLog.setStatus(rs.getInt("status"));
 			twitterStatusLog.setErrorText(rs.getString("error_text"));
-			twitterStatusLog.setUpdated(rs.getTimestamp("updated").getTime());			
+			twitterStatusLog.setUpdated(rs.getLong("updated"));			
 			return twitterStatusLog;
 		}
 	}

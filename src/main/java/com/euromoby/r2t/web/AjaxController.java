@@ -27,51 +27,50 @@ public class AjaxController {
 	private TwitterManager twitterManager;
 
 	@Autowired
-	private Session session;	
+	private Session session;
 
 	@RequestMapping(value = "/feeds", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
 	public @ResponseBody
 	List<TwitterRssFeed> feeds(ModelMap model) {
 		if (session.isNotAuthenticated()) {
 			throw new BadRequestException();
-		}		
-		return twitterManager.findRssFeedsByScreenName(session.getScreenName());
-	}	
-	
-	@RequestMapping(value = "/feeds/new", method = RequestMethod.POST)
-	public @ResponseBody
-	String newFeed(@Valid @ModelAttribute("rss_feed") RssFeed rssFeed, BindingResult result, ModelMap model) {
-		
-		if (session.isNotAuthenticated() || result.hasErrors()) {
-			throw new BadRequestException();
-		}		
-		
-		// ignore duplicates		
-		List<TwitterRssFeed> existingFeeds = twitterManager.findRssFeedsByScreenNameAndUrl(session.getScreenName(), rssFeed.getUrl());
-		if (existingFeeds.isEmpty()) {
-			TwitterRssFeed twitterRssFeed = new TwitterRssFeed();
-			twitterRssFeed.setScreenName(session.getScreenName());
-			twitterRssFeed.setUrl(rssFeed.getUrl());
-			twitterRssFeed.setFrequency(rssFeed.getFrequency());
-			twitterRssFeed.setUpdated(System.currentTimeMillis());
-			twitterManager.saveRssFeed(twitterRssFeed);
 		}
-		return rssFeed.getUrl();
+		return twitterManager.findRssFeedsByScreenName(session.getScreenName());
 	}
 
-	@RequestMapping(value = "/feeds/{id}/delete", method = RequestMethod.POST)	
+	@RequestMapping(value = "/feeds/new", method = RequestMethod.POST)
 	public @ResponseBody
-	String deleteFeed(ModelMap model, @PathVariable("id") Integer id) {
-		
+	Integer newFeed(@Valid @ModelAttribute("rss_feed") RssFeed rssFeed, BindingResult result, ModelMap model) {
+		if (session.isNotAuthenticated() || result.hasErrors()) {
+			throw new BadRequestException();
+		}
+		// ignore duplicates
+		List<TwitterRssFeed> existingFeeds = twitterManager.findRssFeedsByScreenNameAndUrl(session.getScreenName(), rssFeed.getUrl());
+		if (!existingFeeds.isEmpty()) {
+			return 0;
+		}
+		TwitterRssFeed twitterRssFeed = new TwitterRssFeed();
+		twitterRssFeed.setScreenName(session.getScreenName());
+		twitterRssFeed.setUrl(rssFeed.getUrl());
+		twitterRssFeed.setFrequency(rssFeed.getFrequency());
+		twitterRssFeed.setUpdated(0);
+		twitterManager.saveRssFeed(twitterRssFeed);
+		return twitterRssFeed.getId();
+	}
+
+	@RequestMapping(value = "/feeds/{id}/delete", method = RequestMethod.POST)
+	public @ResponseBody
+	Integer deleteFeed(ModelMap model, @PathVariable("id") Integer id) {
+
 		if (session.isNotAuthenticated()) {
 			throw new BadRequestException();
-		}		
+		}
 		TwitterRssFeed twitterRssFeed = twitterManager.findRssFeedsByScreenNameAndId(session.getScreenName(), id);
 		if (twitterRssFeed == null) {
 			throw new ResourceNotFoundException();
 		}
 		twitterManager.deleteRssFeed(twitterRssFeed);
-		return id.toString();
-	}	
-	
+		return id;
+	}
+
 }

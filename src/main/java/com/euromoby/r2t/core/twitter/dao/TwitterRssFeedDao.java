@@ -2,7 +2,6 @@ package com.euromoby.r2t.core.twitter.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -64,13 +63,14 @@ public class TwitterRssFeedDao {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("insert into twitter_rss_feed(screen_name, url, frequency, updated) values (?,?,?,?)", twitterRssFeed.getScreenName(), 
 				twitterRssFeed.getUrl(), twitterRssFeed.getFrequency(),
-				new Timestamp(twitterRssFeed.getUpdated()));
+				twitterRssFeed.getUpdated());
+		twitterRssFeed.setId(jdbcTemplate.queryForObject("select LAST_INSERT_ID()", Integer.class));		
 	}
 
 	public void update(TwitterRssFeed twitterRssFeed) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("update twitter_rss_feed set screen_name = ?, url=?, frequency=?, status=?, error_text=?, updated=? where id = ?", twitterRssFeed.getScreenName(),
-				twitterRssFeed.getUrl(), twitterRssFeed.getFrequency(), twitterRssFeed.getStatus(), twitterRssFeed.getErrorText(), new Timestamp(twitterRssFeed.getUpdated()), twitterRssFeed.getId());
+				twitterRssFeed.getUrl(), twitterRssFeed.getFrequency(), twitterRssFeed.getStatus(), twitterRssFeed.getErrorText(), twitterRssFeed.getUpdated(), twitterRssFeed.getId());
 	}
 
 	public void delete(TwitterRssFeed twitterRssFeed) {
@@ -88,7 +88,7 @@ public class TwitterRssFeedDao {
 			twitterRssFeed.setFrequency(rs.getInt("frequency"));
 			twitterRssFeed.setStatus(rs.getInt("status"));
 			twitterRssFeed.setErrorText(rs.getString("error_text"));
-			twitterRssFeed.setUpdated(rs.getTimestamp("updated").getTime());
+			twitterRssFeed.setUpdated(rs.getLong("updated"));
 			return twitterRssFeed;
 		}
 	}

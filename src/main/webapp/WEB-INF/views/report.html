@@ -2,9 +2,8 @@
 <table class="table table-striped">
 	<thead>
 		<tr>
-			<th>Date</th>
+			<th>Created (GMT)</th>
 			<th>Message</th>
-			<th>Status</th>			
 		</tr>
 	</thead>
 	<tbody>
@@ -12,14 +11,6 @@
 		<tr>
 			<td>$date.toGMT($action.updated)</td>
 			<td>$escape.html($action.message)</td>
-			<td>
-				#if ($action.status == 1)
-					<span class="label label-success">OK</span> 
-				#end
-				#if ($action.status == 2)
-					<span class="label label-danger">ERROR</span> 
-				#end			
-			</td>
 		</tr>
 		#end
 	</tbody>

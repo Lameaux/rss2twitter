@@ -9,7 +9,7 @@ public class DateUtils {
 	private SimpleDateFormat dt;
 
 	public DateUtils() {
-		dt = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss zzz");
+		dt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		dt.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
