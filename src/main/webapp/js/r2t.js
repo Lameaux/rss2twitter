@@ -135,9 +135,6 @@ function loadRssFeeds() {
 		url : '/feeds',
 		dataType: 'json'
 	}).done(function(feeds){
-		if (feeds.length > 0) {
-			$('#rss_feeds_message').addClass('hidden');
-		}
 		$('#rss_list').html('');
 		for (var i = 0; i < feeds.length; i++) {
 			var feed_tr = '';
@@ -178,7 +175,8 @@ function loadRssFeeds() {
 			$('#rss_list').append(feed_object);
 		}
 	}).fail(function(){
-		$('#rss_feeds_message').html('Error loading feeds');
+		$('#add_rss_error').removeClass('hidden');		
+		$('#add_rss_error').html('Error loading feeds');
 	});	
 	
 }
