@@ -1,8 +1,10 @@
 package com.euromoby.r2t.core.rss.task;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -20,20 +22,21 @@ import twitter4j.Status;
 import twitter4j.TwitterException;
 
 import com.euromoby.r2t.core.http.HttpClientProvider;
-import com.euromoby.r2t.core.rss.RSSFeedParser;
-import com.euromoby.r2t.core.rss.model.Feed;
-import com.euromoby.r2t.core.rss.model.FeedMessage;
 import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.twitter.TwitterProvider;
 import com.euromoby.r2t.core.twitter.model.TwitterAccount;
 import com.euromoby.r2t.core.twitter.model.TwitterRssFeed;
 import com.euromoby.r2t.core.twitter.model.TwitterStatusLog;
 import com.euromoby.r2t.core.utils.StringUtils;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 
 @Component
-public class RssBroadcastTask {
+public class FeedBroadcastTask {
 
-	private static final Logger log = LoggerFactory.getLogger(RssBroadcastTask.class);
+	private static final Logger log = LoggerFactory.getLogger(FeedBroadcastTask.class);
 
 	public static final int TWITTER_LIMIT = 140;
 	public static final int HOUR_MICRO = 3600000;
@@ -70,11 +73,12 @@ public class RssBroadcastTask {
 				continue;
 			}
 
-			Feed feed = null;
+			SyndFeed syndFeed = null;
 			try {
 				String rssContent = loadUrl(twitterRssFeed.getUrl());
-				RSSFeedParser rssParser = new RSSFeedParser();
-				feed = rssParser.readFeed(rssContent);				
+				SyndFeedInput input = new SyndFeedInput();
+				InputStream inputStream = IOUtils.toInputStream(rssContent, "UTF-8");
+				syndFeed = input.build(new XmlReader(inputStream));				
 			} catch (IOException io) {
 				String message = "URL is unavailable";
 				log.error(message + " {}", twitterRssFeed.getUrl());
@@ -87,14 +91,14 @@ public class RssBroadcastTask {
 				continue;
 			}
 
-			if (feed == null) {
+			if (syndFeed == null) {
 				String message = "Invalid format";
 				log.error(message + " {}", twitterRssFeed.getUrl());
 				updateErrorStatus(twitterRssFeed, message);
 				continue;
 			}			
 
-			List<FeedMessage> feedMessages = feed.getMessages();
+			List<SyndEntry> feedMessages = syndFeed.getEntries();
 			if (feedMessages.isEmpty()) {
 				updateOkStatus(twitterRssFeed);
 				continue;
@@ -102,7 +106,7 @@ public class RssBroadcastTask {
 
 			TwitterAccount twitterAccount = twitterManager.getAccountByScreenName(twitterRssFeed.getScreenName());
 			
-			for (FeedMessage feedMessage : feedMessages) {
+			for (SyndEntry feedMessage : feedMessages) {
 				if (StringUtils.nullOrEmpty(feedMessage.getLink()) || StringUtils.nullOrEmpty(feedMessage.getTitle())) {
 					continue;
 				}
@@ -128,7 +132,7 @@ public class RssBroadcastTask {
 				}
 				twitterManager.saveStatusLog(twitterStatusLog);					
 				// break after first message
-				// break;
+				break;
 			}
 			updateOkStatus(twitterRssFeed);
 		}
@@ -156,7 +160,7 @@ public class RssBroadcastTask {
 		}
 	}
 
-	private String createTweetText(FeedMessage feedMessage) {
+	private String createTweetText(SyndEntry feedMessage) {
 		String url = StringUtils.trimIfNotEmpty(feedMessage.getLink());
 		String title = StringUtils.trimIfNotEmpty(feedMessage.getTitle());
 		if (url.length() > TWITTER_LIMIT) {
