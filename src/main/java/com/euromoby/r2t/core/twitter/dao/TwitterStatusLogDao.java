@@ -31,9 +31,9 @@ public class TwitterStatusLogDao {
 		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? order by id desc", ROW_MAPPER, screenName);
 	}
 
-	public List<TwitterStatusLog> findAllOkByScreenName(String screenName) {
+	public List<TwitterStatusLog> findLastOkByScreenName(String screenName, int limit) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? and status = ? order by id desc limit 50", ROW_MAPPER, screenName, TwitterStatusLog.STATUS_OK);
+		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? and status = ? order by id desc limit ?", ROW_MAPPER, screenName, TwitterStatusLog.STATUS_OK, limit);
 	}	
 	
 	public List<TwitterStatusLog> findAllByScreenNameAndUrl(String screenName, String url) {

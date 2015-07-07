@@ -41,11 +41,13 @@ public class ProfileController {
 			return "redirect:/error";
 		}
 		model.put("twitter", twitterAccount);
+    	model.put("session", session);
 		return "profile";
 	}
 
 	@RequestMapping(value = "/error", method = RequestMethod.GET)
 	public String error(ModelMap model) {
+    	model.put("session", session);
 		return "error";
 	}	
 

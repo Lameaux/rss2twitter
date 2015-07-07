@@ -17,21 +17,31 @@
 		<div class="header clearfix">
 			<nav>
 				<ul class="nav nav-pills pull-right">
+					
+					#if($session.isNotAuthenticated())
 					<li role="presentation" class="active">
 						<a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Welcome</a>
 					</li>
 					<li>
-						<a href="/profile"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Profile</a>
+						<a href="/twitter/connect"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login</a>
+					</li>
+					#end
+					#if(!$session.isNotAuthenticated())
+					<li role="presentation" class="active">
+						<a href="/profile"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> @$session.screenName</a>
 					</li>
 					<li>
 						<a href="/report"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Report</a>
 					</li>
+					#end
 					<li>
 						<a href="/help"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</a>
 					</li>
+					#if(!$session.isNotAuthenticated())
 					<li>
 						<a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a>
 					</li>
+					#end
 				</ul>
 			</nav>
 			<h3 class="text-muted">R2T</h3>

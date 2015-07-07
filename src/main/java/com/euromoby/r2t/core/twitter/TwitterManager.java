@@ -57,8 +57,8 @@ public class TwitterManager {
 	}
 
 	@Transactional(readOnly = true)
-	public List<TwitterStatusLog> findOkStatusLogsByScreenName(String screenName) {
-		return twitterStatusLogDao.findAllOkByScreenName(screenName);
+	public List<TwitterStatusLog> findLastOkStatusLogsByScreenName(String screenName, int limit) {
+		return twitterStatusLogDao.findLastOkByScreenName(screenName, limit);
 	}	
 	
 	@Transactional(readOnly = true)	

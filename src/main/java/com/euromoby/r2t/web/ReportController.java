@@ -23,9 +23,10 @@ public class ReportController {
 		if (session.isNotAuthenticated()) {
 			return "redirect:/";
 		}
-		model.put("actions", twitterManager.findStatusLogsByScreenName(session.getScreenName()));
+		model.put("actions", twitterManager.findLastOkStatusLogsByScreenName(session.getScreenName(), 50));
 		model.put("escape", new EscapeTool());
 		model.put("date", new DateUtils());
+    	model.put("session", session);
 		return "report";
 	}
 

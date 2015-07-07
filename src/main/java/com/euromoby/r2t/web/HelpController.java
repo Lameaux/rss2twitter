@@ -6,15 +6,15 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-public class WelcomeController {
+public class HelpController {
 	
 	@Autowired
 	private Session session;
 	
-    @RequestMapping("/")
+    @RequestMapping("/help")
     public String welcome(ModelMap model) {
     	model.put("session", session);
-        return "welcome";
+        return "help";
     }	
     
 }
