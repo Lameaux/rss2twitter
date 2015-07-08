@@ -13,14 +13,12 @@ import com.euromoby.r2t.web.exception.ResourceNotFoundException;
 @Controller
 public class LinkController {
 
-	private static final String URL_ID_BASE = "100000";	
-	
 	@Autowired
 	private TwitterManager twitterManager;
 	
-    @RequestMapping("/{id:[0-9]+[a-z0-9]+}")
+    @RequestMapping("/{id:0[a-z0-9]+}")
     public String link(@PathVariable("id") String id, ModelMap model) {
-    	int statusId = Integer.parseInt(id, Character.MAX_RADIX) - Integer.parseInt(URL_ID_BASE, Character.MAX_RADIX);   
+    	int statusId = Integer.parseInt(id.substring(1), Character.MAX_RADIX);   
     	TwitterStatusLog twitterStatusLog = twitterManager.getStatusLogById(statusId);
     	if (twitterStatusLog == null) {
     		throw new ResourceNotFoundException();

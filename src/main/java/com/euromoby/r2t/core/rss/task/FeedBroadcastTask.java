@@ -41,7 +41,7 @@ public class FeedBroadcastTask {
 
 	public static final int TWITTER_LIMIT = 140;
 	public static final int HOUR_MICRO = 3600000;
-	private static final String URL_ID_BASE = "100000";
+	private static final int URL_ID_LENGTH=5;
 	
 	@Autowired
 	private Config config;
@@ -69,7 +69,7 @@ public class FeedBroadcastTask {
 	@Scheduled(fixedDelay = 5000) // 3600000 // = 1 hour
 	public void execute() {
 		
-		int linkLength = config.getShortLinkPrefix().length() + URL_ID_BASE.length();
+		int linkLength = config.getShortLinkPrefix().length() + URL_ID_LENGTH;
 		
 		List<TwitterRssFeed> twitterRssFeeds = twitterManager.findRssFeeds();
 		for (TwitterRssFeed twitterRssFeed : twitterRssFeeds) {
@@ -142,8 +142,7 @@ public class FeedBroadcastTask {
 	}
 
 	private String generateShortLink(int id) {
-		int linkStartId = Integer.parseInt(URL_ID_BASE, Character.MAX_RADIX);		
-		return config.getShortLinkPrefix() + Integer.toString(linkStartId + id, Character.MAX_RADIX);
+		return config.getShortLinkPrefix() + "0" + Integer.toString(id, Character.MAX_RADIX);
 	}
 	
 	private TwitterStatusLog saveNewStatusLog(String screenName, String url, String messageText) {
