@@ -7,6 +7,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,15 @@ public class TwitterStatusLogDao {
 		this.dataSource = dataSource;
 	}
 
+	public TwitterStatusLog findById(Integer id) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		try {
+			return jdbcTemplate.queryForObject("select * from twitter_status_log where id = ?", ROW_MAPPER, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+	}	
+	
 	public List<TwitterStatusLog> findAllByScreenName(String screenName) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? order by id desc", ROW_MAPPER, screenName);
