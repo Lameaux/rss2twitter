@@ -4,6 +4,7 @@
 		<tr>
 			<th>Sent (GMT)</th>
 			<th>Message</th>
+			<th>URL</th>			
 		</tr>
 	</thead>
 	<tbody>
@@ -11,6 +12,7 @@
 		<tr>
 			<td>$date.toGMT($action.updated)</td>
 			<td>$escape.html($action.message)</td>
+			<td>$action.url</td>			
 		</tr>
 		#end
 	</tbody>

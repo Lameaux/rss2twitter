@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 
+import com.euromoby.r2t.core.Config;
 import com.euromoby.r2t.core.http.HttpClientProvider;
 import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.twitter.TwitterProvider;
@@ -40,8 +41,10 @@ public class FeedBroadcastTask {
 
 	public static final int TWITTER_LIMIT = 140;
 	public static final int HOUR_MICRO = 3600000;
+	private static final String URL_ID_BASE = "100000";
 	
-
+	@Autowired
+	private Config config;
 	@Autowired
 	private TwitterManager twitterManager;
 	@Autowired
@@ -65,6 +68,9 @@ public class FeedBroadcastTask {
 	
 	@Scheduled(fixedDelay = 5000) // 3600000 // = 1 hour
 	public void execute() {
+		
+		int linkLength = config.getShortLinkPrefix().length() + URL_ID_BASE.length();
+		
 		List<TwitterRssFeed> twitterRssFeeds = twitterManager.findRssFeeds();
 		for (TwitterRssFeed twitterRssFeed : twitterRssFeeds) {
 
@@ -114,23 +120,20 @@ public class FeedBroadcastTask {
 					continue;
 				}				
 				
-				String statusText = createTweetText(feedMessage);
-				
-				TwitterStatusLog twitterStatusLog = new TwitterStatusLog();
-				twitterStatusLog.setScreenName(twitterAccount.getScreenName());
-				twitterStatusLog.setUrl(feedMessage.getLink());
-				twitterStatusLog.setMessage(statusText);
-				twitterStatusLog.setUpdated(System.currentTimeMillis());
-				twitterStatusLog.setStatus(TwitterStatusLog.STATUS_OK);	
+				String statusText = createTweetText(feedMessage, linkLength);
+				TwitterStatusLog twitterStatusLog = saveNewStatusLog(twitterAccount.getScreenName(), feedMessage.getLink(), statusText);
 				
 				try {
-					Status status = twitterProvider.status(twitterAccount, statusText);
+					
+					Status status = twitterProvider.status(twitterAccount, statusText + " " + generateShortLink(twitterStatusLog.getId()));
 					log.debug("{} updated status {}", twitterAccount.getScreenName(), status.getId());
+					twitterStatusLog.setStatus(TwitterStatusLog.STATUS_OK);
 				} catch (TwitterException e) {
 					twitterStatusLog.setStatus(TwitterStatusLog.STATUS_ERROR);
 					twitterStatusLog.setErrorText(e.getMessage());
 				}
-				twitterManager.saveStatusLog(twitterStatusLog);					
+				updateStatusLog(twitterStatusLog);
+				
 				// break after first message
 				break;
 			}
@@ -138,6 +141,27 @@ public class FeedBroadcastTask {
 		}
 	}
 
+	private String generateShortLink(int id) {
+		int linkStartId = Integer.parseInt(URL_ID_BASE, Character.MAX_RADIX);		
+		return config.getShortLinkPrefix() + Integer.toString(linkStartId + id, Character.MAX_RADIX);
+	}
+	
+	private TwitterStatusLog saveNewStatusLog(String screenName, String url, String messageText) {
+		TwitterStatusLog twitterStatusLog = new TwitterStatusLog();
+		twitterStatusLog.setScreenName(screenName);
+		twitterStatusLog.setUrl(url);
+		twitterStatusLog.setMessage(messageText);
+		twitterStatusLog.setUpdated(System.currentTimeMillis());
+		twitterStatusLog.setStatus(TwitterStatusLog.STATUS_NEW);			
+		twitterManager.saveStatusLog(twitterStatusLog);	
+		return twitterStatusLog;
+	}
+
+	private void updateStatusLog(TwitterStatusLog twitterStatusLog) {
+		twitterStatusLog.setUpdated(System.currentTimeMillis());
+		twitterManager.updateStatusLog(twitterStatusLog);	
+	}	
+	
 	private String loadUrl(String url) throws IOException {
 
 		HttpGet request = new HttpGet(url);
@@ -160,14 +184,9 @@ public class FeedBroadcastTask {
 		}
 	}
 
-	private String createTweetText(SyndEntry feedMessage) {
-		String url = StringUtils.trimIfNotEmpty(feedMessage.getLink());
+	private String createTweetText(SyndEntry feedMessage, int urlLength) {
 		String title = StringUtils.trimIfNotEmpty(feedMessage.getTitle());
-		if (url.length() > TWITTER_LIMIT) {
-			return limitLength(title, TWITTER_LIMIT);
-		}
-		int titleLimit = TWITTER_LIMIT - 1 /* space */- url.length();
-		return limitLength(title, titleLimit) + " " + url;
+		return limitLength(title, TWITTER_LIMIT - (urlLength + 1 /* space */));
 	}
 
 	private String limitLength(String s, int limit) {

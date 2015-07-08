@@ -46,8 +46,15 @@ public class TwitterStatusLogDao {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.update("insert into twitter_status_log(screen_name, url, message, status, updated) values (?,?,?,?,?)", 
 				twitterStatusLog.getScreenName(), twitterStatusLog.getUrl(), twitterStatusLog.getMessage(), twitterStatusLog.getStatus(), twitterStatusLog.getUpdated());
+		twitterStatusLog.setId(jdbcTemplate.queryForObject("select LAST_INSERT_ID()", Integer.class));		
 	}
 
+	public void update(TwitterStatusLog twitterStatusLog) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcTemplate.update("update twitter_status_log set screen_name=?, url=?, message=?, status=?, updated=? where id = ?", 
+				twitterStatusLog.getScreenName(), twitterStatusLog.getUrl(), twitterStatusLog.getMessage(), twitterStatusLog.getStatus(), twitterStatusLog.getUpdated(), twitterStatusLog.getId());
+	}	
+	
 	static class TwitterStatusLogRowMapper implements RowMapper<TwitterStatusLog> {
 		@Override
 		public TwitterStatusLog mapRow(ResultSet rs, int rowNum) throws SQLException {

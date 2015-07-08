@@ -3,6 +3,7 @@ package com.euromoby.r2t.core.twitter.model;
 
 public class TwitterStatusLog {
 
+	public static final int STATUS_NEW = 0;
 	public static final int STATUS_OK = 1;
 	public static final int STATUS_ERROR = 2;
 
@@ -10,7 +11,7 @@ public class TwitterStatusLog {
 	private String screenName;
 	private String message;
 	private String url;
-	private int status = STATUS_OK;
+	private int status = STATUS_NEW;
 	private String errorText;
 	private long updated;
 

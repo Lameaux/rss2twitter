@@ -92,6 +92,11 @@ public class TwitterManager {
 	}
 
 	@Transactional
+	public void updateStatusLog(TwitterStatusLog twitterActionStatus) {
+		twitterStatusLogDao.update(twitterActionStatus);
+	}	
+	
+	@Transactional
 	public TwitterAccount saveAccessToken(AccessToken accessToken) {
 		String screenName = accessToken.getScreenName().toLowerCase();
 		TwitterAccount account = twitterAccountDao.findByScreenName(screenName);

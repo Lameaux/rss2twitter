@@ -22,7 +22,8 @@
 		<property name="proxyHost" value="${twitter.proxy.host}" />
 		<property name="proxyPort" value="${twitter.proxy.port}" />
 		<property name="twitterKey" value="${twitter.key}" />
-		<property name="twitterSecret" value="${twitter.secret}" />								
+		<property name="twitterSecret" value="${twitter.secret}" />
+		<property name="shortLinkPrefix" value="${twitter.link}" />										
 	</bean>
 
     <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager" />
