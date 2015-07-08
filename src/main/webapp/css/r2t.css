@@ -1,6 +1,6 @@
 /* Space out content a bit */
 body {
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 20px;
 }
 
@@ -40,12 +40,18 @@ input.input-feed-url {
 }
 
 .app-content {
-	margin: 40px 0;	
+	margin: 20px 0;	
+}
+
+.container .jumbotron {
+	padding-top: 10px !important;
+	padding-bottom: 20px !important;	
 }
 
 .jumbotron {
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
+  background-color: #FFEBF5;
 }
 .jumbotron .btn {
   padding: 14px 24px;

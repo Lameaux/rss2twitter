@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>$pageTitle - R2T.COM</title>
+	<title>$pageTitle - rsstw.it</title>
 	<link href="/css/bootstrap.css" rel="stylesheet">
 	<link href="/css/r2t.css" rel="stylesheet">
 	<!--[if lt IE 9]>
@@ -20,10 +20,10 @@
 					
 					#if($session.isNotAuthenticated())
 					<li role="presentation" #if($page=='welcome')class="active"#end>
-						<a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Welcome</a>
+						<a href="/"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Welcome</a>
 					</li>
-					<li role="presentation">
-						<a href="/twitter/connect">@ Sign in</a>
+					<li>
+						<a href="/twitter/connect">@ Sign in with Twitter</a>
 					</li>
 					#end
 					#if(!$session.isNotAuthenticated())
@@ -44,11 +44,16 @@
 					#end
 				</ul>
 			</nav>
-			<h3 class="text-muted">R2T - RSS to Twitter</h3>
+			<h3 class="text-muted">
+			<img src="/img/rss_big.png" width="64">
+			<img src="/img/twitter_big.png" width="64">
+			rsstw.it | RSS to Twitter
+
+			</h3>
 		</div>
 		<div class="app-content">$screen_content</div>
 		<footer class="footer">
-			<p>&copy; EUROMOBY 2015</p>
+			<p>&copy; <a href="http://rsstw.it">rsstw.it</a> 2015</p>
 		</footer>
 	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

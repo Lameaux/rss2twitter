@@ -259,7 +259,9 @@ function saveNewFeed(feed_object) {
 		});
 		
 		// init
-		loadRssFeeds();
+		if ($('#rss_list').length) {
+			loadRssFeeds();
+		}
 		
 	});
 

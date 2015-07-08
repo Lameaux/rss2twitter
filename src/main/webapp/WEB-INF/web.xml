@@ -30,6 +30,7 @@
 	    <url-pattern>/css/*</url-pattern>
 	    <url-pattern>/fonts/*</url-pattern>
 	    <url-pattern>/js/*</url-pattern>
+	    <url-pattern>/img/*</url-pattern>
 	</servlet-mapping>   
 	
 	<servlet-mapping>
