@@ -27,6 +27,8 @@ public class ReportController {
 		model.put("escape", new EscapeTool());
 		model.put("date", new DateUtils());
     	model.put("session", session);
+    	model.put("pageTitle", "Last 50 messages");
+    	model.put("page", "report");     	
 		return "report";
 	}
 

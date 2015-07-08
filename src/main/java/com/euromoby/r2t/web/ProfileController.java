@@ -42,12 +42,16 @@ public class ProfileController {
 		}
 		model.put("twitter", twitterAccount);
     	model.put("session", session);
+    	model.put("pageTitle", "@" + session.getScreenName());
+    	model.put("page", "profile");    	
 		return "profile";
 	}
 
 	@RequestMapping(value = "/error", method = RequestMethod.GET)
 	public String error(ModelMap model) {
     	model.put("session", session);
+    	model.put("pageTitle", "Error");
+    	model.put("page", "error");    	    	
 		return "error";
 	}	
 

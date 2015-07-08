@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>RSS 2 Twitter</title>
+	<title>$pageTitle - R2T.COM</title>
 	<link href="/css/bootstrap.css" rel="stylesheet">
 	<link href="/css/r2t.css" rel="stylesheet">
 	<!--[if lt IE 9]>
@@ -19,32 +19,32 @@
 				<ul class="nav nav-pills pull-right">
 					
 					#if($session.isNotAuthenticated())
-					<li role="presentation" class="active">
+					<li role="presentation" #if($page=='welcome')class="active"#end>
 						<a href="/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Welcome</a>
 					</li>
-					<li>
-						<a href="/twitter/connect"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login</a>
+					<li role="presentation">
+						<a href="/twitter/connect">@ Sign in</a>
 					</li>
 					#end
 					#if(!$session.isNotAuthenticated())
-					<li role="presentation" class="active">
-						<a href="/profile"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> @$session.screenName</a>
+					<li role="presentation" #if($page=='profile')class="active"#end>
+						<a href="/profile">@ $session.screenName</a>
 					</li>
-					<li>
+					<li role="presentation" #if($page=='report')class="active"#end>
 						<a href="/report"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Report</a>
 					</li>
 					#end
-					<li>
+					<li role="presentation" #if($page=='help')class="active"#end>
 						<a href="/help"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</a>
 					</li>
 					#if(!$session.isNotAuthenticated())
-					<li>
+					<li role="presentation">
 						<a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a>
 					</li>
 					#end
 				</ul>
 			</nav>
-			<h3 class="text-muted">R2T</h3>
+			<h3 class="text-muted">R2T - RSS to Twitter</h3>
 		</div>
 		<div class="app-content">$screen_content</div>
 		<footer class="footer">

@@ -13,7 +13,14 @@ public class WelcomeController {
 	
     @RequestMapping("/")
     public String welcome(ModelMap model) {
+    	
+		if (!session.isNotAuthenticated()) {
+			return "redirect:/profile";
+		}    	
+    	
     	model.put("session", session);
+    	model.put("pageTitle", "RSS to Twitter");
+    	model.put("page", "welcome");
         return "welcome";
     }	
     

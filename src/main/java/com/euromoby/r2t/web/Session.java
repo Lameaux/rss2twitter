@@ -8,7 +8,7 @@ public class Session implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String screenName = "dirtytovideos"; //null;
+	private String screenName = "sizovjava"; //null;
 
 	public String getScreenName() {
 		return screenName;
