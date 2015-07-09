@@ -19,7 +19,7 @@ public class WelcomeController {
 		}    	
     	
     	model.put("session", session);
-    	model.put("pageTitle", "RSS to Twitter");
+    	model.put("pageTitle", "Share RSS on Twitter");
     	model.put("page", "welcome");
         return "welcome";
     }	

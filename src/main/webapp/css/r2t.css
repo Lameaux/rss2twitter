@@ -50,8 +50,10 @@ input.input-feed-url {
 
 .jumbotron {
   text-align: center;
+  
   border-bottom: 1px solid #e5e5e5;
-  background-color: #FFEBF5;
+  background-color: #fff; /* #FFEBF5; */
+  
 }
 .jumbotron .btn {
   padding: 14px 24px;
