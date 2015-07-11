@@ -60,3 +60,14 @@ input.input-feed-url {
   font-size: 21px;
 }
 
+#sign-in-btn {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #4cae4c;	
+}
+
+#sign-in-btn:hover {
+  color: #fff;
+  background-color: #449d44;
+  border-color: #398439;
+}

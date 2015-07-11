@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Share RSS on Twitter. Export your RSS feeds to Twitter">
+    <meta name="keywords" content="rss, twitter, share, export">
+    <meta name="author" content="rsstw.it">	
+
+    <meta property="og:title" content="Share RSS on Twitter - rsstw.it" />
+    <meta property="og:site_name" content="rsstw.it">
+    <meta property="og:description" content="Automatic export of blog posts and news via RSS on Twitter" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://rsstw.it/" />
+    <meta property="og:image" content="http://rsstw.it/img/logo_small.png" /> 
+    
+    <meta property="twitter:card" content="summary"/>	
+    <meta property="twitter:site" content="@rsstw_it"/>
+    <meta property="twitter:url" content="http://rsstw.it/"/>
+    <meta property="twitter:title" content="Share RSS on Twitter - rsstw.it"/>
+    <meta property="twitter:description" content="Automatic export of blog posts and news via RSS on Twitter"/>
+    <meta property="twitter:image" content="http://rsstw.it/img/logo_small.png"/>  	
+	
 	<title>$pageTitle - rsstw.it</title>
+	<link rel="shortcut icon" href="/favicon.ico">
 	<link href="/css/bootstrap.css" rel="stylesheet">
 	<link href="/css/r2t.css" rel="stylesheet">
 	<!--[if lt IE 9]>
@@ -19,11 +38,8 @@
 				<ul class="nav nav-pills pull-right">
 					
 					#if($session.isNotAuthenticated())
-					<li role="presentation" #if($page=='welcome')class="active"#end>
-						<a href="/"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Welcome</a>
-					</li>
 					<li>
-						<a href="/twitter/connect">@ Sign in with Twitter</a>
+						<a href="/twitter/connect" id="sign-in-btn"><b>Sign in with Twitter</b></a>
 					</li>
 					#end
 					#if(!$session.isNotAuthenticated())
@@ -44,11 +60,9 @@
 					#end
 				</ul>
 			</nav>
-			<h3>
-			<img src="/img/rss_big.png" width="32">
-			<img src="/img/twitter_big.png" width="32">
-			<small>rsstw.it - share RSS on Twitter</small>
-			</h3>
+			<a href="/" title="rsstw.it - share RSS on Twitter">
+			<img src="/img/logo_wide.png" title="rsstw.it - share RSS on Twitter" alt="rsstw.it - share RSS on Twitter">
+			</a>
 		</div>
 		<div class="app-content">$screen_content</div>
 		<footer class="footer">

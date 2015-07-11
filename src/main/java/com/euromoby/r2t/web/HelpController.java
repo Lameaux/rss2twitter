@@ -14,7 +14,7 @@ public class HelpController {
     @RequestMapping("/help")
     public String welcome(ModelMap model) {
     	model.put("session", session);
-    	model.put("pageTitle", "Help Center");
+    	model.put("pageTitle", "How to share RSS on Twitter");
     	model.put("page", "help");    	
         return "help";
     }	

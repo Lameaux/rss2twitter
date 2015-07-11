@@ -66,7 +66,7 @@ public class FeedBroadcastTask {
 		twitterManager.updateRssFeed(twitterRssFeed);			
 	}	
 	
-	@Scheduled(fixedDelay = 5000) // 3600000 // = 1 hour
+	@Scheduled(fixedDelay = 600000) // 10 min // 3600000 // = 1 hour
 	public void execute() {
 		
 		int linkLength = config.getShortLinkPrefix().length() + URL_ID_LENGTH;
