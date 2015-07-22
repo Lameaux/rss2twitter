@@ -11,6 +11,7 @@ public class Config {
 	private String twitterSecret;
 	private String httpUserAgent = DEFAULT_HTTP_USERAGENT;
 	private String shortLinkPrefix;
+	private int taskPoolSize;
 
 	public int getClientTimeout() {
 		return clientTimeout;
@@ -66,6 +67,14 @@ public class Config {
 
 	public void setShortLinkPrefix(String shortLinkPrefix) {
 		this.shortLinkPrefix = shortLinkPrefix;
+	}
+
+	public int getTaskPoolSize() {
+		return taskPoolSize;
+	}
+
+	public void setTaskPoolSize(int taskPoolSize) {
+		this.taskPoolSize = taskPoolSize;
 	}
 
 }
