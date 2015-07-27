@@ -24,7 +24,8 @@
 		<property name="twitterKey" value="${twitter.key}" />
 		<property name="twitterSecret" value="${twitter.secret}" />
 		<property name="shortLinkPrefix" value="${twitter.link}" />
-		<property name="taskPoolSize" value="${twitter.task.pool}" />												
+		<property name="taskPoolSize" value="${twitter.task.pool}" />
+		<property name="follow" value="${twitter.follow}" />														
 	</bean>
 
     <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager" />

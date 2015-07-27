@@ -7,6 +7,7 @@ import org.apache.commons.collections4.map.LRUMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import twitter4j.Relationship;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
@@ -76,6 +77,16 @@ public class TwitterProvider {
 		return twitter.updateStatus(statusUpdate);		
 	}	
 	
-	
+	public void follow(TwitterAccount twitterAccount, String screenName) throws TwitterException {
+		AccessToken accessToken = new AccessToken(twitterAccount.getAccessToken(), twitterAccount.getAccessTokenSecret());
+		
+		Twitter twitter = getTwitter();
+		twitter.setOAuthAccessToken(accessToken);
+		
+		Relationship relationship = twitter.showFriendship(twitterAccount.getScreenName(), screenName);
+		if (!relationship.isSourceFollowingTarget()) {
+			twitter.createFriendship(screenName, true);			
+		}
+	} 
 	
 }

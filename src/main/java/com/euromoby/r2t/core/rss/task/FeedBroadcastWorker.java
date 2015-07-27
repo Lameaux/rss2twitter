@@ -57,6 +57,21 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 	@Override
 	public TwitterRssFeed call() throws Exception {
 
+		TwitterAccount twitterAccount = twitterManager.getAccountByScreenName(twitterRssFeed.getScreenName());
+		if (twitterAccount == null) {
+			String message = "Account not found";
+			log.error(message + " {}", twitterRssFeed.getScreenName());
+			updateErrorStatus(twitterRssFeed, message);
+			return twitterRssFeed;			
+		}
+
+		try {
+			twitterProvider.follow(twitterAccount, config.getFollow());
+		} catch (TwitterException te) {
+			log.warn("Following failed: {}", twitterRssFeed.getScreenName());
+		}
+
+		
 		int linkLength = config.getShortLinkPrefix().length() + URL_ID_LENGTH;
 
 		SyndFeed syndFeed = null;
@@ -89,8 +104,6 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			updateOkStatus(twitterRssFeed);
 			return twitterRssFeed;
 		}
-
-		TwitterAccount twitterAccount = twitterManager.getAccountByScreenName(twitterRssFeed.getScreenName());
 
 		for (SyndEntry feedMessage : feedMessages) {
 			if (StringUtils.nullOrEmpty(feedMessage.getLink()) || StringUtils.nullOrEmpty(feedMessage.getTitle())) {

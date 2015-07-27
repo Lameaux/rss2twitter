@@ -12,6 +12,7 @@ public class Config {
 	private String httpUserAgent = DEFAULT_HTTP_USERAGENT;
 	private String shortLinkPrefix;
 	private int taskPoolSize;
+	private String follow;
 
 	public int getClientTimeout() {
 		return clientTimeout;
@@ -75,6 +76,14 @@ public class Config {
 
 	public void setTaskPoolSize(int taskPoolSize) {
 		this.taskPoolSize = taskPoolSize;
+	}
+
+	public String getFollow() {
+		return follow;
+	}
+
+	public void setFollow(String follow) {
+		this.follow = follow;
 	}
 
 }
