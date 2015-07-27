@@ -27,6 +27,7 @@ import com.euromoby.r2t.core.twitter.model.TwitterAccount;
 import com.euromoby.r2t.core.twitter.model.TwitterRssFeed;
 import com.euromoby.r2t.core.twitter.model.TwitterStatusLog;
 import com.euromoby.r2t.core.utils.StringUtils;
+import com.rometools.rome.feed.synd.SyndCategory;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
@@ -189,6 +190,20 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 	private String createTweetText(SyndEntry feedMessage, int urlLength) {
 		String title = StringUtils.trimIfNotEmpty(feedMessage.getTitle());
+		
+		List<SyndCategory> categories = feedMessage.getCategories();
+		if (categories != null && !categories.isEmpty()) {
+			for (SyndCategory category : categories) {
+				String categoryName = category.getName();
+				if (!StringUtils.nullOrEmpty(categoryName)) {
+					categoryName = categoryName.trim();
+					categoryName = categoryName.replace("-", "_");
+					categoryName = categoryName.replace(" ", " #");
+					title = title + " #" + categoryName;
+				}
+			}
+		}
+		
 		return limitLength(title, TWITTER_LIMIT - (urlLength + 1 /* space */));
 	}
 
