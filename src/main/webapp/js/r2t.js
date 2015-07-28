@@ -215,6 +215,8 @@ function saveNewFeed(feed_object) {
 
 	$(function() {
 		
+		$.ajaxSetup({ cache: false });
+		
 		$('button#add_rss_url').click(function() {
 			var feed_tr = '';
 			feed_tr = feed_tr + '<tr class="info">';
