@@ -20,8 +20,16 @@ public class LinkController {
 	
     @RequestMapping("/{id:0[a-z0-9]+}")
     public ModelAndView link(@PathVariable("id") String id) {
-    	int statusId = Integer.parseInt(id.substring(1), Character.MAX_RADIX);   
-    	TwitterStatusLog twitterStatusLog = twitterManager.getStatusLogById(statusId);
+    	
+    	TwitterStatusLog twitterStatusLog = null;
+    	
+    	try {
+    		int statusId = Integer.parseInt(id.substring(1), Character.MAX_RADIX);   
+    		twitterStatusLog = twitterManager.getStatusLogById(statusId);
+    	} catch (Exception e) {
+    		// ignore
+    	}
+    	
     	if (twitterStatusLog == null) {
     		throw new ResourceNotFoundException();
     	}
