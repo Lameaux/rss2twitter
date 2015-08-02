@@ -54,10 +54,19 @@ input.input-feed-url {
   border-bottom: 1px solid #e5e5e5;
   background-color: #fff; /* #FFEBF5; */
   
+  background-image: url(/img/cloud.jpg);
+  background-size: cover;
+  
 }
+
+.jumbotron h1 {
+	color: #FFEBF5;
+}
+
 .jumbotron .btn {
   padding: 14px 24px;
   font-size: 21px;
+  margin: 20px;
 }
 
 #sign-in-btn {
