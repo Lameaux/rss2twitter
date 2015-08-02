@@ -1,0 +1,5 @@
+User-agent: *
+
+Disallow: /twitter
+
+Sitemap: http://rsstw.it/static/sitemap.xml

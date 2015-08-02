@@ -8,6 +8,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.DisposableBean;
@@ -23,15 +24,19 @@ public class HttpClientProvider implements DisposableBean {
 
 	private Config config;
 	private CloseableHttpClient httpClient;
+	private SSLContextProvider sslContextProvider;
 
 	@Autowired	
-	public HttpClientProvider(Config config){
+	public HttpClientProvider(Config config, SSLContextProvider sslContextProvider){
 		this.config = config;
+		this.sslContextProvider = sslContextProvider;
 		this.httpClient = createHttpClient();
 	}
 	
 	protected CloseableHttpClient createHttpClient() {
 		return HttpClientBuilder.create()
+				.setSslcontext(sslContextProvider.getSSLContext())
+				.setSSLHostnameVerifier(new NoopHostnameVerifier())
 				.setUserAgent(config.getHttpUserAgent())
 				.build();
 	}

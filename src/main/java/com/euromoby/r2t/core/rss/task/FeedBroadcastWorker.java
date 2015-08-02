@@ -69,7 +69,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		try {
 			twitterProvider.follow(twitterAccount, config.getFollow());
 		} catch (TwitterException te) {
-			log.warn("Following failed: {}", twitterRssFeed.getScreenName());
+			log.warn("Following failed: " + twitterRssFeed.getScreenName(), te);
 		}
 
 		
@@ -83,12 +83,12 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			syndFeed = input.build(new XmlReader(inputStream));
 		} catch (IOException io) {
 			String message = "URL is unavailable";
-			log.error(message + " {}", twitterRssFeed.getUrl());
+			log.error(message + " " + twitterRssFeed.getUrl(), io);
 			updateErrorStatus(twitterRssFeed, message);
 			return twitterRssFeed;
 		} catch (Exception e) {
 			String message = "Invalid format";
-			log.error(message + " {}", twitterRssFeed.getUrl());
+			log.error(message + " " + twitterRssFeed.getUrl(), e);
 			updateErrorStatus(twitterRssFeed, message);
 			return twitterRssFeed;
 		}
