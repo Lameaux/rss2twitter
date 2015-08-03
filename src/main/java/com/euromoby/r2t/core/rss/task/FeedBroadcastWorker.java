@@ -1,11 +1,12 @@
 package com.euromoby.r2t.core.rss.task;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -63,7 +64,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			String message = "Account not found";
 			log.error(message + " {}", twitterRssFeed.getScreenName());
 			updateErrorStatus(twitterRssFeed, message);
-			return twitterRssFeed;			
+			return twitterRssFeed;
 		}
 
 		try {
@@ -72,15 +73,18 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			log.warn("Following failed: " + twitterRssFeed.getScreenName(), te);
 		}
 
-		
 		int linkLength = config.getShortLinkPrefix().length() + URL_ID_LENGTH;
 
 		SyndFeed syndFeed = null;
 		try {
-			String rssContent = loadUrl(twitterRssFeed.getUrl());
+			byte[] rssContent = loadUrl(twitterRssFeed.getUrl());
 			SyndFeedInput input = new SyndFeedInput();
-			InputStream inputStream = IOUtils.toInputStream(rssContent, "UTF-8");
-			syndFeed = input.build(new XmlReader(inputStream));
+			String encoding = detectEncoding(rssContent);
+			// read bytes with encoding
+			String javaString = new String(rssContent, encoding);
+			// stream as utf-8
+			InputStreamReader isr = new InputStreamReader(new CharSequenceInputStream(javaString, "utf-8"));
+			syndFeed = input.build(isr);
 		} catch (IOException io) {
 			String message = "URL is unavailable";
 			log.error(message + " " + twitterRssFeed.getUrl(), io);
@@ -136,6 +140,19 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		return twitterRssFeed;
 	}
 
+	private String detectEncoding(byte[] xmlContent) throws IOException {
+		ByteArrayInputStream bais = new ByteArrayInputStream(xmlContent);
+		XmlReader xmlReader = new XmlReader(bais);
+		try {
+			if (xmlReader.getEncoding() != null) {
+				return xmlReader.getEncoding().toLowerCase();
+			}
+			return null;
+		} finally {
+			xmlReader.close();	
+		}
+	}
+	
 	private TwitterStatusLog saveNewStatusLog(String screenName, String url, String messageText) {
 		TwitterStatusLog twitterStatusLog = new TwitterStatusLog();
 		twitterStatusLog.setScreenName(screenName);
@@ -166,7 +183,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		twitterManager.updateStatusLog(twitterStatusLog);
 	}
 
-	private String loadUrl(String url) throws IOException {
+	private byte[] loadUrl(String url) throws IOException {
 
 		HttpGet request = new HttpGet(url);
 		RequestConfig.Builder requestConfigBuilder = httpClientProvider.createRequestConfigBuilder();
@@ -180,7 +197,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			}
 
 			HttpEntity entity = response.getEntity();
-			String content = EntityUtils.toString(entity);
+			byte[] content = EntityUtils.toByteArray(entity);
 			EntityUtils.consumeQuietly(entity);
 			return content;
 		} finally {
@@ -190,7 +207,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 	private String createTweetText(SyndEntry feedMessage, int urlLength) {
 		String title = StringUtils.trimIfNotEmpty(feedMessage.getTitle());
-		
+
 		List<SyndCategory> categories = feedMessage.getCategories();
 		if (categories != null && !categories.isEmpty()) {
 			for (SyndCategory category : categories) {
@@ -203,7 +220,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 				}
 			}
 		}
-		
+
 		return limitLength(title, TWITTER_LIMIT - (urlLength + 1 /* space */));
 	}
 
