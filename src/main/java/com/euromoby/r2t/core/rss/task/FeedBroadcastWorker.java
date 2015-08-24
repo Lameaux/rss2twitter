@@ -128,9 +128,9 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			InputStream picture = createTweetPicture(feedMessage); 
 			TwitterStatusLog twitterStatusLog = saveNewStatusLog(twitterAccount.getScreenName(), feedMessage.getLink(), statusText);
 
+			String shortLink = generateShortLink(twitterStatusLog.getId());
 			try {
-
-				Status status = twitterProvider.status(twitterAccount, statusText + " " + generateShortLink(twitterStatusLog.getId()), picture);
+				Status status = twitterProvider.status(twitterAccount, statusText + " " + shortLink);
 				log.debug("{} updated status {}", twitterAccount.getScreenName(), status.getId());
 				twitterStatusLog.setStatus(TwitterStatusLog.STATUS_OK);
 			} catch (TwitterException e) {
@@ -139,6 +139,15 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			}
 			updateStatusLog(twitterStatusLog);
 
+			if (picture != null) {
+				try {
+					Status pictureStatus = twitterProvider.picture(twitterAccount, feedMessage.getLink(), picture);
+					log.debug("{} updated picture status {}", twitterAccount.getScreenName(), pictureStatus.getId());
+				} catch (TwitterException e) {
+					log.debug("Unable to post picture status", e);
+				}
+			}
+			
 			// break after first message
 			break;
 		}

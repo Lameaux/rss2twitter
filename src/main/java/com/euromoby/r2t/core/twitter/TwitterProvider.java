@@ -68,7 +68,18 @@ public class TwitterProvider {
 		return accessToken;
 	}
 	
-	public Status status(TwitterAccount twitterAccount, String text, InputStream picture) throws TwitterException {
+	public Status status(TwitterAccount twitterAccount, String text) throws TwitterException {
+		AccessToken accessToken = new AccessToken(twitterAccount.getAccessToken(), twitterAccount.getAccessTokenSecret());
+		
+		Twitter twitter = getTwitter();
+		twitter.setOAuthAccessToken(accessToken);
+		
+				
+		StatusUpdate statusUpdate = new StatusUpdate(text);
+		return twitter.updateStatus(statusUpdate);		
+	}	
+
+	public Status picture(TwitterAccount twitterAccount, String text, InputStream picture) throws TwitterException {
 		AccessToken accessToken = new AccessToken(twitterAccount.getAccessToken(), twitterAccount.getAccessTokenSecret());
 		
 		Twitter twitter = getTwitter();
