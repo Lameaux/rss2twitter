@@ -1,5 +1,6 @@
 package com.euromoby.r2t.core.twitter;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
@@ -67,13 +68,17 @@ public class TwitterProvider {
 		return accessToken;
 	}
 	
-	public Status status(TwitterAccount twitterAccount, String text) throws TwitterException {
+	public Status status(TwitterAccount twitterAccount, String text, InputStream picture) throws TwitterException {
 		AccessToken accessToken = new AccessToken(twitterAccount.getAccessToken(), twitterAccount.getAccessTokenSecret());
 		
 		Twitter twitter = getTwitter();
 		twitter.setOAuthAccessToken(accessToken);
 		
+				
 		StatusUpdate statusUpdate = new StatusUpdate(text);
+		if (picture != null) {
+			statusUpdate.setMedia(String.valueOf(text.hashCode()), picture);
+		}
 		return twitter.updateStatus(statusUpdate);		
 	}	
 	

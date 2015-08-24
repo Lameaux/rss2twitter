@@ -15,6 +15,7 @@ import twitter4j.auth.AccessToken;
 import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.twitter.TwitterProvider;
 import com.euromoby.r2t.core.twitter.model.TwitterAccount;
+import com.euromoby.r2t.core.utils.StringUtils;
 
 @Controller
 public class ProfileController {
@@ -72,7 +73,13 @@ public class ProfileController {
 	}
 
 	@RequestMapping(value = "/twitter/oauth", method = RequestMethod.GET)
-	public String oAuthTwitterAccount(ModelMap model, @RequestParam("oauth_token") String oAuthToken, @RequestParam("oauth_verifier") String oAuthVerifier) {
+	public String oAuthTwitterAccount(ModelMap model, @RequestParam(value="oauth_token", required=false) String oAuthToken, @RequestParam(value="oauth_verifier", required=false) String oAuthVerifier, @RequestParam(value="denied", required=false) String denied) {
+		
+		if (!StringUtils.nullOrEmpty(denied)) {
+			log.debug("auth denied", denied);
+			return "redirect:/";			
+		}
+		
 		try {
 			AccessToken accessToken = twitterProvider.getAccessToken(oAuthToken, oAuthVerifier);
 			TwitterAccount twitterAccount = twitterManager.saveAccessToken(accessToken);

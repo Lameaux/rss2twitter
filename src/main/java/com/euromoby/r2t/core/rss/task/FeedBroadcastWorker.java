@@ -2,9 +2,12 @@ package com.euromoby.r2t.core.rss.task;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.http.HttpEntity;
@@ -40,7 +43,10 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 	private static final int TWITTER_LIMIT = 140;
 	private static final int URL_ID_LENGTH = 5;
-
+	
+	private static final Pattern IMAGE_PATTERN = Pattern.compile("<img[^>]+src=\"([^\">]+)\"",Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+	private static final int MIN_IMG_SIZE = 2 * 1024;
+	
 	private Config config;
 	private TwitterManager twitterManager;
 	private TwitterProvider twitterProvider;
@@ -119,11 +125,12 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			}
 
 			String statusText = createTweetText(feedMessage, linkLength);
+			InputStream picture = createTweetPicture(feedMessage); 
 			TwitterStatusLog twitterStatusLog = saveNewStatusLog(twitterAccount.getScreenName(), feedMessage.getLink(), statusText);
 
 			try {
 
-				Status status = twitterProvider.status(twitterAccount, statusText + " " + generateShortLink(twitterStatusLog.getId()));
+				Status status = twitterProvider.status(twitterAccount, statusText + " " + generateShortLink(twitterStatusLog.getId()), picture);
 				log.debug("{} updated status {}", twitterAccount.getScreenName(), status.getId());
 				twitterStatusLog.setStatus(TwitterStatusLog.STATUS_OK);
 			} catch (TwitterException e) {
@@ -224,6 +231,26 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		return limitLength(title, TWITTER_LIMIT - (urlLength + 1 /* space */));
 	}
 
+	private InputStream createTweetPicture(SyndEntry feedMessage) {
+		if (feedMessage.getDescription() == null || feedMessage.getDescription().getValue() == null) {
+			return null;
+		}
+		String description = feedMessage.getDescription().getValue();
+		Matcher m = IMAGE_PATTERN.matcher(description);
+		if (m.find()) {
+			String pictureUrl = m.group(1);
+			try {
+				byte[] picture = loadUrl(pictureUrl);
+				if (picture.length > MIN_IMG_SIZE) {
+					return new ByteArrayInputStream(picture);					
+				}
+			} catch (IOException ioe) {
+				log.debug("Unable to download {}", pictureUrl, ioe);
+			}
+		}
+		return null;
+	}
+	
 	private String limitLength(String s, int limit) {
 		if (s.length() <= limit) {
 			return s;
