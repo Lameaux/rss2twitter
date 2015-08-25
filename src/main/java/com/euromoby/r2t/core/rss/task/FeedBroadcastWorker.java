@@ -41,9 +41,8 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 	private static final Logger log = LoggerFactory.getLogger(FeedBroadcastWorker.class);
 
-	private static final int TWITTER_LIMIT = 120;
-	private static final int TWITTER_PIC_LENGTH = 25;
-	private static final int URL_ID_LENGTH = 5;
+	private static final int TWITTER_LIMIT = 116;
+	private static final int TWITTER_PIC_LENGTH = 24;
 	
 	private static final Pattern IMAGE_PATTERN = Pattern.compile("<img[^>]+src=\"([^\">]+)\"",Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 	private static final int MIN_IMG_SIZE = 2 * 1024;
@@ -79,8 +78,6 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		} catch (TwitterException te) {
 			log.warn("Following failed: " + twitterRssFeed.getScreenName(), te);
 		}
-
-		int linkLength = config.getShortLinkPrefix().length() + URL_ID_LENGTH;
 
 		SyndFeed syndFeed = null;
 		try {
@@ -126,11 +123,8 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			}
 
 			InputStream picture = createTweetPicture(feedMessage);
-			int reserveText = linkLength;
-			if (picture != null) {
-				reserveText += TWITTER_PIC_LENGTH;
-			}
-			String statusText = createTweetText(feedMessage, reserveText);
+			boolean hasPicture = picture != null;
+			String statusText = createTweetText(feedMessage, hasPicture);
 			TwitterStatusLog twitterStatusLog = createStatusLog(twitterAccount.getScreenName(), feedMessage.getLink(), statusText);
 
 			String shortLink = twitterManager.generateShortLink(twitterStatusLog.getId());
@@ -229,7 +223,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		}
 	}
 
-	private String createTweetText(SyndEntry feedMessage, int urlLength) {
+	private String createTweetText(SyndEntry feedMessage, boolean hasImage) {
 		String title = StringUtils.trimIfNotEmpty(feedMessage.getTitle());
 		
 		List<SyndCategory> categories = feedMessage.getCategories();
@@ -245,7 +239,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			}
 		}
 
-		return limitLength(title, TWITTER_LIMIT - (urlLength + 1 /* 1 space */));
+		return limitLength(title, TWITTER_LIMIT - (hasImage ? TWITTER_PIC_LENGTH : 0));
 	}
 
 	private InputStream createTweetPicture(SyndEntry feedMessage) {
