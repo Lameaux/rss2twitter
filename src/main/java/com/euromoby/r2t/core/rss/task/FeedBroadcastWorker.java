@@ -41,8 +41,8 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 	private static final Logger log = LoggerFactory.getLogger(FeedBroadcastWorker.class);
 
-	private static final int TWITTER_LIMIT = 140;
-	private static final int TWITTER_PIC_LENGTH = 21;
+	private static final int TWITTER_LIMIT = 120;
+	private static final int TWITTER_PIC_LENGTH = 25;
 	private static final int URL_ID_LENGTH = 5;
 	
 	private static final Pattern IMAGE_PATTERN = Pattern.compile("<img[^>]+src=\"([^\">]+)\"",Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
