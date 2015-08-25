@@ -130,7 +130,15 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 			String shortLink = generateShortLink(twitterStatusLog.getId());
 			try {
-				Status status = twitterProvider.status(twitterAccount, statusText + " " + shortLink);
+				
+				String statusTextWithLink;
+				if (statusText.contains("#")) {
+					statusTextWithLink = statusText.replaceFirst("#", shortLink + " #");
+				} else {
+					statusTextWithLink = statusText + " " + shortLink;
+				}
+				
+				Status status = twitterProvider.status(twitterAccount, statusTextWithLink, picture);
 				log.debug("{} updated status {}", twitterAccount.getScreenName(), status.getId());
 				twitterStatusLog.setStatus(TwitterStatusLog.STATUS_OK);
 			} catch (TwitterException e) {
@@ -138,15 +146,6 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 				twitterStatusLog.setErrorText(e.getMessage());
 			}
 			updateStatusLog(twitterStatusLog);
-
-			if (picture != null) {
-				try {
-					Status pictureStatus = twitterProvider.picture(twitterAccount, feedMessage.getLink(), picture);
-					log.debug("{} updated picture status {}", twitterAccount.getScreenName(), pictureStatus.getId());
-				} catch (TwitterException e) {
-					log.debug("Unable to post picture status", e);
-				}
-			}
 			
 			// break after first message
 			break;
@@ -223,12 +222,12 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 	private String createTweetText(SyndEntry feedMessage, int urlLength) {
 		String title = StringUtils.trimIfNotEmpty(feedMessage.getTitle());
-
+		
 		List<SyndCategory> categories = feedMessage.getCategories();
 		if (categories != null && !categories.isEmpty()) {
 			for (SyndCategory category : categories) {
 				String categoryName = category.getName();
-				if (!StringUtils.nullOrEmpty(categoryName)) {
+				if (!StringUtils.nullOrEmpty(categoryName) && categoryName.length() > 1) {
 					categoryName = categoryName.trim();
 					categoryName = categoryName.replace("-", "_");
 					categoryName = categoryName.replace(" ", " #");
@@ -237,7 +236,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			}
 		}
 
-		return limitLength(title, TWITTER_LIMIT - (urlLength + 1 /* space */));
+		return limitLength(title, TWITTER_LIMIT - (urlLength + 1 /* 1 space */));
 	}
 
 	private InputStream createTweetPicture(SyndEntry feedMessage) {
