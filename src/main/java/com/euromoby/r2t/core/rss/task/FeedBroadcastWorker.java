@@ -126,9 +126,9 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 			String statusText = createTweetText(feedMessage, linkLength);
 			InputStream picture = createTweetPicture(feedMessage); 
-			TwitterStatusLog twitterStatusLog = saveNewStatusLog(twitterAccount.getScreenName(), feedMessage.getLink(), statusText);
+			TwitterStatusLog twitterStatusLog = createStatusLog(twitterAccount.getScreenName(), feedMessage.getLink(), statusText);
 
-			String shortLink = generateShortLink(twitterStatusLog.getId());
+			String shortLink = twitterManager.generateShortLink(twitterStatusLog.getId());
 			try {
 				
 				String statusTextWithLink;
@@ -168,14 +168,18 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		}
 	}
 	
-	private TwitterStatusLog saveNewStatusLog(String screenName, String url, String messageText) {
-		TwitterStatusLog twitterStatusLog = new TwitterStatusLog();
+	private TwitterStatusLog createStatusLog(String screenName, String url, String messageText) {
+		
+		TwitterStatusLog twitterStatusLog = twitterManager.findErrorStatus(screenName, url);
+		if (twitterStatusLog == null) {
+			twitterStatusLog = new TwitterStatusLog();	
+		}
 		twitterStatusLog.setScreenName(screenName);
 		twitterStatusLog.setUrl(url);
 		twitterStatusLog.setMessage(messageText);
 		twitterStatusLog.setUpdated(System.currentTimeMillis());
 		twitterStatusLog.setStatus(TwitterStatusLog.STATUS_NEW);
-		twitterManager.saveStatusLog(twitterStatusLog);
+		twitterManager.saveOrUpdateStatusLog(twitterStatusLog);
 		return twitterStatusLog;
 	}
 
@@ -266,8 +270,6 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		return s.substring(0, limit - 1);
 	}
 
-	private String generateShortLink(int id) {
-		return config.getShortLinkPrefix() + "0" + Integer.toString(id, Character.MAX_RADIX);
-	}
+
 
 }

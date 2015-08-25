@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import twitter4j.auth.AccessToken;
 
+import com.euromoby.r2t.core.Config;
 import com.euromoby.r2t.core.twitter.dao.TwitterAccountDao;
 import com.euromoby.r2t.core.twitter.dao.TwitterRssFeedDao;
 import com.euromoby.r2t.core.twitter.dao.TwitterStatusLogDao;
@@ -24,6 +25,8 @@ public class TwitterManager {
 	private TwitterRssFeedDao twitterRssFeedDao;
 	@Autowired
 	private TwitterStatusLogDao twitterStatusLogDao;
+	@Autowired
+	private Config config;
 
 	@Transactional(readOnly = true)
 	public TwitterAccount getAccountByScreenName(String screenName) {
@@ -60,12 +63,22 @@ public class TwitterManager {
 	public List<TwitterStatusLog> findLastOkStatusLogsByScreenName(String screenName, int limit) {
 		return twitterStatusLogDao.findLastOkByScreenName(screenName, limit);
 	}	
+
+	@Transactional(readOnly = true)
+	public List<TwitterStatusLog> findLastStatusLogs(int limit) {
+		return twitterStatusLogDao.findLast(limit);
+	}	
 	
 	@Transactional(readOnly = true)	
 	public boolean alreadySent(String screenName, String url) {
-		return twitterStatusLogDao.findAllByScreenNameAndUrl(screenName, url).size() > 0;
+		return twitterStatusLogDao.findOkByScreenNameAndUrl(screenName, url) != null;
 	}
 
+	@Transactional(readOnly = true)	
+	public TwitterStatusLog findErrorStatus(String screenName, String url) {
+		return twitterStatusLogDao.findErrorByScreenNameAndUrl(screenName, url);
+	}	
+	
 	@Transactional(readOnly = true)	
 	public TwitterStatusLog getStatusLogById(Integer id) {
 		return twitterStatusLogDao.findById(id);
@@ -100,6 +113,15 @@ public class TwitterManager {
 	public void updateStatusLog(TwitterStatusLog twitterActionStatus) {
 		twitterStatusLogDao.update(twitterActionStatus);
 	}	
+
+	@Transactional
+	public void saveOrUpdateStatusLog(TwitterStatusLog twitterActionStatus) {
+		if (twitterActionStatus.getId() != null) {
+			twitterStatusLogDao.update(twitterActionStatus);
+		} else {
+			twitterStatusLogDao.save(twitterActionStatus);
+		}
+	}	
 	
 	@Transactional
 	public TwitterAccount saveAccessToken(AccessToken accessToken) {
@@ -119,4 +141,8 @@ public class TwitterManager {
 		return account;
 	}
 
+	public String generateShortLink(int id) {
+		return config.getShortLinkPrefix() + "0" + Integer.toString(id, Character.MAX_RADIX);
+	}	
+	
 }

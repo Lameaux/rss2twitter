@@ -1,7 +1,7 @@
 <div class="jumbotron">
-	<h1>Share RSS on Twitter</h1>
-	<img src="/img/rss_big.png" alt="RSS Feed" title="Export RSS to Twitter" /> 
-	<img src="/img/twitter_big.png" alt="Export to Twitter" title="Import RSS into Twitter" />
+	<h1>Export RSS to Twitter</h1>
+	<img src="/img/rss_big.png" width="120" alt="RSS Feed" title="Export RSS to Twitter" /> 
+	<img src="/img/twitter_big.png" width="120" alt="Export to Twitter" title="Import RSS into Twitter" />
 
 	<br>
 	<p>
@@ -13,12 +13,22 @@
 
 <div class="row">
 	<div class="col-md-6">
-		<h2>Have an RSS feed?</h2>
-		<p>Share your news and articles on Twitter.</p>
+		<h2 class="list-group-item list-group-item-info">Have an RSS feed?</h2>
+		<p class="list-group-item">Share your news and articles on Twitter.</p>
+
 	</div>
 	<div class="col-md-6">
-		<h2>Blogger, WordPress, Tumblr</h2>
-		<p>Automatically share your blog posts on Twitter.</p>
+		<h2 class="list-group-item list-group-item-info">Blogger, WordPress, Tumblr</h2>
+		<p class="list-group-item">Automatically share your blog posts on Twitter.</p>
 	</div>
-
+	<div class="col-md-12">
+		<h2 class="list-group-item list-group-item-info">Last exported tweets</h2>
+		#foreach($tweet in $lastTweets)
+		<p class="list-group-item">
+		<a href="http://twitter.com/${tweet.screenName}" target="_blank"><b>@${tweet.screenName}</b></a>
+		$escape.html($tweet.message)
+		<a href="${urlMap.get($tweet.id)}" target="_blank">${urlMap.get($tweet.id)}</a>
+		</p>
+		#end
+	</div>
 </div>

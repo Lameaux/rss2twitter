@@ -45,11 +45,29 @@ public class TwitterStatusLogDao {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? and status = ? order by id desc limit ?", ROW_MAPPER, screenName, TwitterStatusLog.STATUS_OK, limit);
 	}	
-	
-	public List<TwitterStatusLog> findAllByScreenNameAndUrl(String screenName, String url) {
+
+	public List<TwitterStatusLog> findLast(int limit) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		return jdbcTemplate.query("select * from twitter_status_log where screen_name = ? and url = ?", ROW_MAPPER, screenName, url);
+		return jdbcTemplate.query("select * from twitter_status_log order by id desc limit ?", ROW_MAPPER, limit);
+	}	
+	
+	public TwitterStatusLog findOkByScreenNameAndUrl(String screenName, String url) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		try {
+			return jdbcTemplate.queryForObject("select * from twitter_status_log where screen_name = ? and status = ? and url = ? limit 1", ROW_MAPPER, screenName, TwitterStatusLog.STATUS_OK, url);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		} 
 	}
+
+	public TwitterStatusLog findErrorByScreenNameAndUrl(String screenName, String url) {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		try {
+			return jdbcTemplate.queryForObject("select * from twitter_status_log where screen_name = ? and status = ? and url = ? limit 1", ROW_MAPPER, screenName, TwitterStatusLog.STATUS_ERROR, url);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		} 
+	}	
 	
 	
 	public void save(TwitterStatusLog twitterStatusLog) {
@@ -61,8 +79,8 @@ public class TwitterStatusLogDao {
 
 	public void update(TwitterStatusLog twitterStatusLog) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.update("update twitter_status_log set screen_name=?, url=?, message=?, status=?, updated=? where id = ?", 
-				twitterStatusLog.getScreenName(), twitterStatusLog.getUrl(), twitterStatusLog.getMessage(), twitterStatusLog.getStatus(), twitterStatusLog.getUpdated(), twitterStatusLog.getId());
+		jdbcTemplate.update("update twitter_status_log set screen_name=?, url=?, message=?, status=?, error_text=?, updated=? where id = ?", 
+				twitterStatusLog.getScreenName(), twitterStatusLog.getUrl(), twitterStatusLog.getMessage(), twitterStatusLog.getStatus(), twitterStatusLog.getErrorText(), twitterStatusLog.getUpdated(), twitterStatusLog.getId());
 	}	
 	
 	static class TwitterStatusLogRowMapper implements RowMapper<TwitterStatusLog> {
