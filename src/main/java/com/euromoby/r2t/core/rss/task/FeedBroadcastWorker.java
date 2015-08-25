@@ -132,8 +132,8 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			try {
 				
 				String statusTextWithLink;
-				if (statusText.contains("#")) {
-					statusTextWithLink = statusText.replaceFirst("#", shortLink + " #");
+				if (statusText.contains(" #")) {
+					statusTextWithLink = statusText.replaceFirst(" #", " " + shortLink + " #");
 				} else {
 					statusTextWithLink = statusText + " " + shortLink;
 				}
