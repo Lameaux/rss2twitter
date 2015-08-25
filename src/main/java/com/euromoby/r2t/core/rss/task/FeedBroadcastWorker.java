@@ -42,6 +42,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 	private static final Logger log = LoggerFactory.getLogger(FeedBroadcastWorker.class);
 
 	private static final int TWITTER_LIMIT = 140;
+	private static final int TWITTER_PIC_LENGTH = 21;
 	private static final int URL_ID_LENGTH = 5;
 	
 	private static final Pattern IMAGE_PATTERN = Pattern.compile("<img[^>]+src=\"([^\">]+)\"",Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
@@ -124,8 +125,12 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 				continue;
 			}
 
-			String statusText = createTweetText(feedMessage, linkLength);
-			InputStream picture = createTweetPicture(feedMessage); 
+			InputStream picture = createTweetPicture(feedMessage);
+			int reserveText = linkLength;
+			if (picture != null) {
+				reserveText += TWITTER_PIC_LENGTH;
+			}
+			String statusText = createTweetText(feedMessage, reserveText);
 			TwitterStatusLog twitterStatusLog = createStatusLog(twitterAccount.getScreenName(), feedMessage.getLink(), statusText);
 
 			String shortLink = twitterManager.generateShortLink(twitterStatusLog.getId());
@@ -231,7 +236,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		if (categories != null && !categories.isEmpty()) {
 			for (SyndCategory category : categories) {
 				String categoryName = category.getName();
-				if (!StringUtils.nullOrEmpty(categoryName) && categoryName.length() > 1) {
+				if (!StringUtils.nullOrEmpty(categoryName) && categoryName.length() > 2) {
 					categoryName = categoryName.trim();
 					categoryName = categoryName.replace("-", "_");
 					categoryName = categoryName.replace(" ", " #");
