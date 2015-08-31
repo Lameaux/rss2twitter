@@ -1,11 +1,12 @@
 package com.euromoby.r2t.core.twitter.model;
 
-
 public class TwitterAccount {
 
 	private String screenName;
 	private String accessToken;
 	private String accessTokenSecret;
+	private String suggestedSlug;
+	private long lastFollow;
 
 	public String getScreenName() {
 		return screenName;
@@ -29,6 +30,22 @@ public class TwitterAccount {
 
 	public void setAccessTokenSecret(String accessTokenSecret) {
 		this.accessTokenSecret = accessTokenSecret;
+	}
+
+	public String getSuggestedSlug() {
+		return suggestedSlug;
+	}
+
+	public void setSuggestedSlug(String suggestedSlug) {
+		this.suggestedSlug = suggestedSlug;
+	}
+
+	public long getLastFollow() {
+		return lastFollow;
+	}
+
+	public void setLastFollow(long lastFollow) {
+		this.lastFollow = lastFollow;
 	}
 
 }

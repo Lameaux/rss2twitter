@@ -7,8 +7,13 @@ CREATE DATABASE rss2twitter CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE TABLE IF NOT EXISTS twitter_account (
 	screen_name VARCHAR(20) NOT NULL PRIMARY KEY,
 	access_token VARCHAR(255),
-	access_token_secret VARCHAR(255)	
+	access_token_secret VARCHAR(255),
+	suggested_slug VARCHAR(255) DEFAULT NULL,
+	last_follow BIGINT DEFAULT 0
 ) ENGINE=InnoDB;
+
+-- ALTER TABLE twitter_account ADD suggested_slug VARCHAR(255) DEFAULT NULL;
+-- ALTER TABLE twitter_account ADD last_follow BIGINT DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS twitter_rss_feed (
 	id INT auto_increment PRIMARY KEY, 

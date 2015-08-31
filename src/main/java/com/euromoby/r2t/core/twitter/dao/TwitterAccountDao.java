@@ -2,6 +2,7 @@ package com.euromoby.r2t.core.twitter.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -25,6 +26,11 @@ public class TwitterAccountDao {
 		this.dataSource = dataSource;
 	}
 
+	public List<TwitterAccount> findAll() {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		return jdbcTemplate.query("select * from twitter_account", ROW_MAPPER);
+	}	
+	
 	public TwitterAccount findByScreenName(String screenName) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		try {
@@ -42,8 +48,8 @@ public class TwitterAccountDao {
 
 	public void update(TwitterAccount twitterAccount) {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		jdbcTemplate.update("update twitter_account set access_token = ?, access_token_secret = ? where screen_name = ?", twitterAccount.getAccessToken(),
-				twitterAccount.getAccessTokenSecret(), twitterAccount.getScreenName());
+		jdbcTemplate.update("update twitter_account set access_token = ?, access_token_secret = ?, last_follow = ? where screen_name = ?", twitterAccount.getAccessToken(),
+				twitterAccount.getAccessTokenSecret(), twitterAccount.getLastFollow(), twitterAccount.getScreenName());
 	}
 
 	static class TwitterAccountRowMapper implements RowMapper<TwitterAccount> {
@@ -53,6 +59,8 @@ public class TwitterAccountDao {
 			twitterAccount.setScreenName(rs.getString("screen_name"));
 			twitterAccount.setAccessToken(rs.getString("access_token"));
 			twitterAccount.setAccessTokenSecret(rs.getString("access_token_secret"));
+			twitterAccount.setSuggestedSlug(rs.getString("suggested_slug"));
+			twitterAccount.setLastFollow(rs.getLong("last_follow"));
 			return twitterAccount;
 		}
 	}

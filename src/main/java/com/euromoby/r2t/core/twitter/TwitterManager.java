@@ -34,6 +34,11 @@ public class TwitterManager {
 	}
 
 	@Transactional(readOnly = true)
+	public List<TwitterAccount> findAccounts() {
+		return twitterAccountDao.findAll();
+	}	
+	
+	@Transactional(readOnly = true)
 	public List<TwitterRssFeed> findRssFeedsByScreenName(String screenName) {
 		return twitterRssFeedDao.findAllByScreenName(screenName);
 	}

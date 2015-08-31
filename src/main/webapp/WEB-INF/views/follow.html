@@ -1,0 +1,10 @@
+<h2>$pageTitle</h2>
+<div class="row">
+<ul class="list-group">
+#foreach ($user in $accounts)
+	<li class="list-group-item col-xs-12 col-sm-4 col-md-2">
+		<img src="$user.miniProfileImageURL"> $user.screenName
+	</li>
+#end
+</ul>
+</div>

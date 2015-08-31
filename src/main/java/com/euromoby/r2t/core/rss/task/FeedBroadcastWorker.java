@@ -73,12 +73,6 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 			return twitterRssFeed;
 		}
 
-		try {
-			twitterProvider.follow(twitterAccount, config.getFollow());
-		} catch (TwitterException te) {
-			log.warn("Following failed: " + twitterRssFeed.getScreenName(), te);
-		}
-
 		SyndFeed syndFeed = null;
 		try {
 			byte[] rssContent = loadUrl(twitterRssFeed.getUrl());
