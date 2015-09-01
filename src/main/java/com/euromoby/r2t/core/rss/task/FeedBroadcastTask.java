@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import twitter4j.PagableResponseList;
 import twitter4j.TwitterException;
 import twitter4j.User;
 
@@ -19,6 +20,7 @@ import com.euromoby.r2t.core.http.HttpClientProvider;
 import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.twitter.TwitterProvider;
 import com.euromoby.r2t.core.twitter.model.TwitterAccount;
+import com.euromoby.r2t.core.twitter.model.TwitterFriend;
 import com.euromoby.r2t.core.twitter.model.TwitterRssFeed;
 import com.euromoby.r2t.core.utils.StringUtils;
 
@@ -28,6 +30,7 @@ public class FeedBroadcastTask {
 	private static final Logger log = LoggerFactory.getLogger(FeedBroadcastTask.class);
 
 	public static final int HOUR_MICRO = 3600000;
+	private static final int FOLLOWERS_COUNT = 200;
 
 	private Config config;
 	private TwitterManager twitterManager;
@@ -74,11 +77,23 @@ public class FeedBroadcastTask {
 					// follow rsstw.it
 					twitterProvider.follow(twitterAccount, config.getFollow());
 					// follow suggested
-					if (!StringUtils.nullOrEmpty(twitterAccount.getSuggestedSlug())) {
-						List<User> suggestions = twitterProvider.getSuggestions(twitterAccount, twitterAccount.getSuggestedSlug());
-						if (!suggestions.isEmpty()) {
-							twitterProvider.follow(twitterAccount, suggestions.get(0).getScreenName().toLowerCase());
-						}
+					if (!StringUtils.nullOrEmpty(twitterAccount.getFollowScreenName())) {
+						long cursor = -1;
+						PagableResponseList<User> followers;
+						boolean followed = false;
+						while (!followed && cursor != 0) {
+							followers = twitterProvider.getFollowersForScreenName(twitterAccount, twitterAccount.getFollowScreenName(), cursor, FOLLOWERS_COUNT);
+							for (User user : followers) {
+								String followerScreenName = user.getScreenName().toLowerCase();
+								if (!twitterManager.hasFriend(twitterAccount.getScreenName(), followerScreenName)) {
+									twitterProvider.follow(twitterAccount, followerScreenName);
+									twitterManager.saveFriend(new TwitterFriend(twitterAccount.getScreenName(), followerScreenName));
+									followed = true;
+									break;
+								}
+							}
+							cursor = followers.getNextCursor();
+						}						
 					}
 				} catch (TwitterException te) {
 					log.warn("Following failed for " + twitterAccount.getScreenName(), te);

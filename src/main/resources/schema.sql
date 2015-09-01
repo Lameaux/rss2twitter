@@ -8,12 +8,9 @@ CREATE TABLE IF NOT EXISTS twitter_account (
 	screen_name VARCHAR(20) NOT NULL PRIMARY KEY,
 	access_token VARCHAR(255),
 	access_token_secret VARCHAR(255),
-	suggested_slug VARCHAR(255) DEFAULT NULL,
+	follow_screen_name VARCHAR(20) DEFAULT NULL,
 	last_follow BIGINT DEFAULT 0
 ) ENGINE=InnoDB;
-
--- ALTER TABLE twitter_account ADD suggested_slug VARCHAR(255) DEFAULT NULL;
--- ALTER TABLE twitter_account ADD last_follow BIGINT DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS twitter_rss_feed (
 	id INT auto_increment PRIMARY KEY, 
@@ -37,4 +34,10 @@ CREATE TABLE IF NOT EXISTS twitter_status_log (
 ) ENGINE=InnoDB;
 CREATE INDEX twitter_status_log_url ON twitter_status_log(screen_name, url);
 
+
+CREATE TABLE IF NOT EXISTS twitter_friend (
+	screen_name VARCHAR(20),
+	friend_screen_name VARCHAR(20),
+	primary key (screen_name, friend_screen_name)
+) ENGINE=InnoDB;
 

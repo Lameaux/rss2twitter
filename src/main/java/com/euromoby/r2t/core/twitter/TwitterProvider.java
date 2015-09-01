@@ -88,6 +88,10 @@ public class TwitterProvider {
 	}
 
 	public void follow(TwitterAccount twitterAccount, String screenName) throws TwitterException {
+		if (twitterAccount.getScreenName().equalsIgnoreCase(screenName)) {
+			return;
+		}
+		
 		AccessToken accessToken = new AccessToken(twitterAccount.getAccessToken(), twitterAccount.getAccessTokenSecret());
 
 		Twitter twitter = getTwitter();
@@ -137,6 +141,15 @@ public class TwitterProvider {
 		}
 
 		return followers;
+	}
+
+	public PagableResponseList<User> getFollowersForScreenName(TwitterAccount twitterAccount, String screenName, long cursor, int count) throws TwitterException {
+		AccessToken accessToken = new AccessToken(twitterAccount.getAccessToken(), twitterAccount.getAccessTokenSecret());
+
+		Twitter twitter = getTwitter();
+		twitter.setOAuthAccessToken(accessToken);
+
+		return twitter.getFollowersList(screenName, cursor, 200);
 	}
 
 	public List<Category> getSuggestedUserCategories(TwitterAccount twitterAccount) throws TwitterException {

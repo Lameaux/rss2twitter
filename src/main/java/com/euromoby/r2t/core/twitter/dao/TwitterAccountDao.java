@@ -59,7 +59,7 @@ public class TwitterAccountDao {
 			twitterAccount.setScreenName(rs.getString("screen_name"));
 			twitterAccount.setAccessToken(rs.getString("access_token"));
 			twitterAccount.setAccessTokenSecret(rs.getString("access_token_secret"));
-			twitterAccount.setSuggestedSlug(rs.getString("suggested_slug"));
+			twitterAccount.setFollowScreenName(rs.getString("follow_screen_name"));
 			twitterAccount.setLastFollow(rs.getLong("last_follow"));
 			return twitterAccount;
 		}

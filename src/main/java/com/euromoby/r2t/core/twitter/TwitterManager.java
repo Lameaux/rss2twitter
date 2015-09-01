@@ -10,9 +10,11 @@ import twitter4j.auth.AccessToken;
 
 import com.euromoby.r2t.core.Config;
 import com.euromoby.r2t.core.twitter.dao.TwitterAccountDao;
+import com.euromoby.r2t.core.twitter.dao.TwitterFriendDao;
 import com.euromoby.r2t.core.twitter.dao.TwitterRssFeedDao;
 import com.euromoby.r2t.core.twitter.dao.TwitterStatusLogDao;
 import com.euromoby.r2t.core.twitter.model.TwitterAccount;
+import com.euromoby.r2t.core.twitter.model.TwitterFriend;
 import com.euromoby.r2t.core.twitter.model.TwitterRssFeed;
 import com.euromoby.r2t.core.twitter.model.TwitterStatusLog;
 
@@ -26,6 +28,8 @@ public class TwitterManager {
 	@Autowired
 	private TwitterStatusLogDao twitterStatusLogDao;
 	@Autowired
+	private TwitterFriendDao twitterFriendDao;
+	@Autowired
 	private Config config;
 
 	@Transactional(readOnly = true)
@@ -33,6 +37,16 @@ public class TwitterManager {
 		return twitterAccountDao.findByScreenName(screenName);
 	}
 
+	@Transactional(readOnly = true)
+	public boolean hasFriend(String screenName, String friendScreenName) {
+		return twitterFriendDao.find(screenName, friendScreenName) != null;
+	}	
+
+	@Transactional
+	public void saveFriend(TwitterFriend twitterFriend) {
+		twitterFriendDao.save(twitterFriend);
+	}	
+	
 	@Transactional(readOnly = true)
 	public List<TwitterAccount> findAccounts() {
 		return twitterAccountDao.findAll();
@@ -57,7 +71,6 @@ public class TwitterManager {
 	public List<TwitterRssFeed> findRssFeeds() {
 		return twitterRssFeedDao.findAll();
 	}
-	
 	
 	@Transactional(readOnly = true)
 	public List<TwitterStatusLog> findStatusLogsByScreenName(String screenName) {

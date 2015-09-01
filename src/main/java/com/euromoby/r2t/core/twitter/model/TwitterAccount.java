@@ -5,7 +5,7 @@ public class TwitterAccount {
 	private String screenName;
 	private String accessToken;
 	private String accessTokenSecret;
-	private String suggestedSlug;
+	private String followScreenName;
 	private long lastFollow;
 
 	public String getScreenName() {
@@ -32,12 +32,12 @@ public class TwitterAccount {
 		this.accessTokenSecret = accessTokenSecret;
 	}
 
-	public String getSuggestedSlug() {
-		return suggestedSlug;
+	public String getFollowScreenName() {
+		return followScreenName;
 	}
 
-	public void setSuggestedSlug(String suggestedSlug) {
-		this.suggestedSlug = suggestedSlug;
+	public void setFollowScreenName(String followScreenName) {
+		this.followScreenName = followScreenName;
 	}
 
 	public long getLastFollow() {
