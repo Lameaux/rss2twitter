@@ -81,7 +81,8 @@ public class FeedBroadcastTask {
 						long cursor = -1;
 						PagableResponseList<User> followers;
 						boolean followed = false;
-						while (!followed && cursor != 0) {
+						int requestLimit = 7;
+						while (!followed && cursor != 0 && requestLimit-- > 0) {
 							followers = twitterProvider.getFollowersForScreenName(twitterAccount, twitterAccount.getFollowScreenName(), cursor, FOLLOWERS_COUNT);
 							for (User user : followers) {
 								String followerScreenName = user.getScreenName().toLowerCase();
