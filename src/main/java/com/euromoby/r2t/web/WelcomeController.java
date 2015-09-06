@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.twitter.model.TwitterStatusLog;
@@ -51,5 +52,21 @@ public class WelcomeController {
     	model.put("page", "welcome");
         return "welcome";
     }	
-    
+ 
+	@RequestMapping(value = "/error", method = RequestMethod.GET)
+	public String error(ModelMap model) {
+    	model.put("session", session);
+    	model.put("pageTitle", "Error");
+    	model.put("page", "error");    	    	
+		return "error";
+	}    
+
+    @RequestMapping("/help")
+    public String help(ModelMap model) {
+    	model.put("session", session);
+    	model.put("pageTitle", "How to share RSS on Twitter");
+    	model.put("page", "help");    	
+        return "help";
+    }	
+	
 }

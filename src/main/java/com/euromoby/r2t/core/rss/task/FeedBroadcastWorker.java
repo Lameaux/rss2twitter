@@ -4,19 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.input.CharSequenceInputStream;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +25,7 @@ import com.euromoby.r2t.core.twitter.TwitterProvider;
 import com.euromoby.r2t.core.twitter.model.TwitterAccount;
 import com.euromoby.r2t.core.twitter.model.TwitterRssFeed;
 import com.euromoby.r2t.core.twitter.model.TwitterStatusLog;
+import com.euromoby.r2t.core.utils.HttpUtils;
 import com.euromoby.r2t.core.utils.StringUtils;
 import com.rometools.rome.feed.synd.SyndCategory;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -75,7 +71,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 
 		SyndFeed syndFeed = null;
 		try {
-			byte[] rssContent = loadUrl(twitterRssFeed.getUrl());
+			byte[] rssContent = HttpUtils.loadUrl(httpClientProvider, twitterRssFeed.getUrl());
 			SyndFeedInput input = new SyndFeedInput();
 			String encoding = detectEncoding(rssContent);
 			// read bytes with encoding
@@ -195,41 +191,28 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		twitterManager.updateStatusLog(twitterStatusLog);
 	}
 
-	private byte[] loadUrl(String url) throws IOException {
-
-		HttpGet request = new HttpGet(url);
-		RequestConfig.Builder requestConfigBuilder = httpClientProvider.createRequestConfigBuilder();
-		request.setConfig(requestConfigBuilder.build());
-		CloseableHttpResponse response = httpClientProvider.executeRequest(request);
-		try {
-			StatusLine statusLine = response.getStatusLine();
-			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-				EntityUtils.consumeQuietly(response.getEntity());
-				throw new IOException(statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
-			}
-
-			HttpEntity entity = response.getEntity();
-			byte[] content = EntityUtils.toByteArray(entity);
-			EntityUtils.consumeQuietly(entity);
-			return content;
-		} finally {
-			response.close();
-		}
-	}
-
 	private String createTweetText(SyndEntry feedMessage, boolean hasImage) {
 		String title = StringUtils.trimIfNotEmpty(feedMessage.getTitle());
 		
 		List<SyndCategory> categories = feedMessage.getCategories();
 		if (categories != null && !categories.isEmpty()) {
+			Set<String> categoriesSet = new LinkedHashSet<String>();
 			for (SyndCategory category : categories) {
 				String categoryName = category.getName();
-				if (!StringUtils.nullOrEmpty(categoryName) && categoryName.length() > 2) {
-					categoryName = categoryName.trim();
-					categoryName = categoryName.replace("-", "_");
-					categoryName = categoryName.replace(" ", " #");
-					title = title + " #" + categoryName;
+				if (!StringUtils.nullOrEmpty(categoryName)) {
+					categoryName = categoryName.replaceAll("[\\[\\](){},.;:!?<>%#]", "").toLowerCase();
+					categoryName = categoryName.trim().replace("-", "_");
+					
+					String[] categoryNameParts = categoryName.split(" ");
+					for (String categoryNamePart : categoryNameParts) {
+						if (!StringUtils.nullOrEmpty(categoryNamePart) && categoryNamePart.length() > 1) {
+							categoriesSet.add(categoryNamePart);
+						}
+					}
 				}
+			}
+			for (String categoryName : categoriesSet) {
+				title = title + " #" + categoryName;
 			}
 		}
 
@@ -245,7 +228,7 @@ public class FeedBroadcastWorker implements Callable<TwitterRssFeed> {
 		if (m.find()) {
 			String pictureUrl = m.group(1);
 			try {
-				byte[] picture = loadUrl(pictureUrl);
+				byte[] picture = HttpUtils.loadUrl(httpClientProvider, pictureUrl);
 				if (picture.length > MIN_IMG_SIZE) {
 					return new ByteArrayInputStream(picture);					
 				}

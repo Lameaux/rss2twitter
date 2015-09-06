@@ -1,4 +1,4 @@
-package com.euromoby.r2t.web;
+package com.euromoby.r2t.web.twitter;
 
 import org.apache.velocity.tools.generic.EscapeTool;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.utils.DateUtils;
+import com.euromoby.r2t.web.Session;
 
 @Controller
-public class ReportController {
+public class TwitterReportController {
 
 	@Autowired
 	private TwitterManager twitterManager;

@@ -13,6 +13,8 @@ public class Config {
 	private String shortLinkPrefix;
 	private int taskPoolSize;
 	private String follow;
+	private String vkAppId;
+	private String vkSecureKey;
 
 	public int getClientTimeout() {
 		return clientTimeout;
@@ -84,6 +86,22 @@ public class Config {
 
 	public void setFollow(String follow) {
 		this.follow = follow;
+	}
+
+	public String getVkAppId() {
+		return vkAppId;
+	}
+
+	public void setVkAppId(String vkAppId) {
+		this.vkAppId = vkAppId;
+	}
+
+	public String getVkSecureKey() {
+		return vkSecureKey;
+	}
+
+	public void setVkSecureKey(String vkSecureKey) {
+		this.vkSecureKey = vkSecureKey;
 	}
 
 }

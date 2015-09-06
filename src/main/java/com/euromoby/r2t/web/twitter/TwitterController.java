@@ -1,4 +1,4 @@
-package com.euromoby.r2t.web;
+package com.euromoby.r2t.web.twitter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +16,12 @@ import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.twitter.TwitterProvider;
 import com.euromoby.r2t.core.twitter.model.TwitterAccount;
 import com.euromoby.r2t.core.utils.StringUtils;
+import com.euromoby.r2t.web.Session;
 
 @Controller
-public class ProfileController {
+public class TwitterController {
 
-	private static final Logger log = LoggerFactory.getLogger(ProfileController.class);
+	private static final Logger log = LoggerFactory.getLogger(TwitterController.class);
 	
 	@Autowired
 	private TwitterManager twitterManager;
@@ -47,14 +48,6 @@ public class ProfileController {
     	model.put("page", "profile");    	
 		return "profile";
 	}
-
-	@RequestMapping(value = "/error", method = RequestMethod.GET)
-	public String error(ModelMap model) {
-    	model.put("session", session);
-    	model.put("pageTitle", "Error");
-    	model.put("page", "error");    	    	
-		return "error";
-	}	
 
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	public String logout(ModelMap model) {

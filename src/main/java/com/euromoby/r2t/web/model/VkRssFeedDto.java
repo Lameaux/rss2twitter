@@ -3,10 +3,13 @@ package com.euromoby.r2t.web.model;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-public class RssFeed {
+public class VkRssFeedDto {
 
 	@NotNull
 	private String url;
+
+	@NotNull
+	private String wall;
 
 	@Min(1)
 	private int frequency;
@@ -17,6 +20,14 @@ public class RssFeed {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public String getWall() {
+		return wall;
+	}
+
+	public void setWall(String wall) {
+		this.wall = wall;
 	}
 
 	public int getFrequency() {

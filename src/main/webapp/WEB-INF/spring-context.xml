@@ -26,6 +26,8 @@
 		<property name="shortLinkPrefix" value="${twitter.link}" />
 		<property name="taskPoolSize" value="${twitter.task.pool}" />
 		<property name="follow" value="${twitter.follow}" />														
+		<property name="vkAppId" value="${vk.app.id}" />
+		<property name="vkSecureKey" value="${vk.secure.key}" />
 	</bean>
 
     <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager" />

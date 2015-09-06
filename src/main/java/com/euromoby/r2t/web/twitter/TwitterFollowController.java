@@ -1,4 +1,4 @@
-package com.euromoby.r2t.web;
+package com.euromoby.r2t.web.twitter;
 
 import java.util.List;
 
@@ -15,11 +15,12 @@ import twitter4j.User;
 import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.twitter.TwitterProvider;
 import com.euromoby.r2t.core.twitter.model.TwitterAccount;
+import com.euromoby.r2t.web.Session;
 
 @Controller
-public class FollowController {
+public class TwitterFollowController {
 
-	private static final Logger log = LoggerFactory.getLogger(FollowController.class);
+	private static final Logger log = LoggerFactory.getLogger(TwitterFollowController.class);
 
 	@Autowired
 	private TwitterManager twitterManager;

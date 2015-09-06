@@ -1,6 +1,6 @@
 var urlPattern = /https?:\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
 
-function restoreActionButtons(feed_object) {
+function vkRestoreActionButtons(feed_object) {
 	feed_object.removeClass('info');
 	
 	var tr_feed_action = feed_object.find('.feed-action');
@@ -11,15 +11,15 @@ function restoreActionButtons(feed_object) {
 	);
 	
 	feed_object.find('button.feed-edit').click(function(){
-		makeFeedEditable(feed_object);
+		vkMakeFeedEditable(feed_object);
 	});	
 	
 	feed_object.find('button.feed-delete').click(function(){
-		makeFeedDeletable(feed_object);
+		vkMakeFeedDeletable(feed_object);
 	});	
 }
 
-function makeFeedText(feed_object) {
+function vkMakeFeedText(feed_object) {
 
 	var tr_feed_url_input = feed_object.find('.input-feed-url');
 	var feedUrl = tr_feed_url_input.val();
@@ -32,10 +32,10 @@ function makeFeedText(feed_object) {
 	tr_feed_frequency_input.replaceWith('<span class="hours">' + feedFrequency + '</span>');
 	tr_feed_frequency.append(' ' + (feedFrequency == '1' ? 'hour' : 'hours'));
 	
-	restoreActionButtons(feed_object);
+	vkRestoreActionButtons(feed_object);
 }
 
-function makeFeedDeletable(feed_object) {
+function vkMakeFeedDeletable(feed_object) {
 	feed_object.addClass('info');
 
 	var feed_id = feed_object.attr('id').split('-')[1];	
@@ -49,23 +49,23 @@ function makeFeedDeletable(feed_object) {
 	feed_object.find('button.feed-confirm-delete').click(function(){
 		$.ajax({
 			type : 'POST',
-			url : '/feeds/' + feed_id + '/delete'
+			url : '/vk/feeds/' + feed_id + '/delete'
 		}).done(function(){
 			feed_object.html('');
 		}).fail(function(){
 			$('#add_rss_error').removeClass('hidden');
 			$('#add_rss_error').html('Unknown Server Error');
-			restoreActionButtons(feed_object);
+			vkRestoreActionButtons(feed_object);
 		});			
 	});	
 	
 	feed_object.find('button.feed-cancel').click(function(){
-		restoreActionButtons(feed_object);
+		vkRestoreActionButtons(feed_object);
 	});	
 	
 }	
 	
-function makeFeedEditable(feed_object) {
+function vkMakeFeedEditable(feed_object) {
 	feed_object.addClass('info');
 	
 	var feed_id = feed_object.attr('id').split('-')[1];
@@ -101,7 +101,7 @@ function makeFeedEditable(feed_object) {
 		var feedFrequencyNew = feed_object.find('.select-feed-frequency').val();
 		$.ajax({
 			type : 'POST',
-			url : '/feeds/' + feed_id + '/edit',
+			url : '/vk/feeds/' + feed_id + '/edit',
 			data : {
 				url : feedUrlNew,
 				frequency : feedFrequencyNew
@@ -111,27 +111,27 @@ function makeFeedEditable(feed_object) {
 				feed_object.find('.feed-status').html('<span class="label label-primary">NEW</span>');
 				feed_object.find('.feed-updated').html('');
 			}
-			makeFeedText(feed_object);
+			vkMakeFeedText(feed_object);
 		}).fail(function(){
 			$('#add_rss_error').removeClass('hidden');
 			$('#add_rss_error').html('Unknown Server Error');
-			restoreActionButtons(feed_object);
+			vkRestoreActionButtons(feed_object);
 		});			
 	});	
 	
 	feed_object.find('button.feed-cancel').click(function(){
 		feed_object.find('.input-feed-url').val(feedUrl);
 		feed_object.find('.select-feed-frequency').val(feedFrequency);
-		makeFeedText(feed_object);
+		vkMakeFeedText(feed_object);
 	});
 	
 }
 
-function loadRssFeeds() {
+function vkLoadRssFeeds() {
 
 	$.ajax({
 		type : 'GET',
-		url : '/feeds',
+		url : '/vk/feeds',
 		dataType: 'json'
 	}).done(function(feeds){
 		$('#rss_list').html('');
@@ -139,6 +139,7 @@ function loadRssFeeds() {
 			var feed_tr = '';
 			feed_tr = feed_tr + '<tr id="feed-'+ feeds[i].id +'">';
 			feed_tr = feed_tr + '<td class="feed-url">' + feeds[i].url + '</td>';
+			feed_tr = feed_tr + '<td class="feed-wall">' + getGroupNameById(feeds[i].wallOwnerId) + ' ' + feeds[i].wallOwnerId +'</td>';
 			feed_tr = feed_tr + '<td class="feed-frequency">';
 			var freq = feeds[i].frequency;
 			feed_tr = feed_tr + '<span class="hours">' + freq + '</span> ' + (freq > 1 ? 'hours' : 'hour');
@@ -166,10 +167,10 @@ function loadRssFeeds() {
 			
 			var feed_object = $(feed_tr);
 			feed_object.find('.feed-delete').click(function(){
-				makeFeedDeletable($(this).parent().parent());	
+				vkMakeFeedDeletable($(this).parent().parent());	
 			});
 			feed_object.find('.feed-edit').click(function(){
-				makeFeedEditable($(this).parent().parent());
+				vkMakeFeedEditable($(this).parent().parent());
 			});				
 			$('#rss_list').append(feed_object);
 		}
@@ -180,7 +181,7 @@ function loadRssFeeds() {
 	
 }
 
-function saveNewFeed(feed_object) {
+function vkSaveNewFeed(feed_object) {
 	var url_input = feed_object.find('.input-feed-url');
 	if (!urlPattern.test(url_input.val())) {
 		url_input.data('title', 'Invalid RSS feed URL');
@@ -189,12 +190,14 @@ function saveNewFeed(feed_object) {
 	}
 	var rssUrl = url_input.val();
 	var rssFrequency = feed_object.find('.select-feed-frequency').val();			
+	var rssWall = feed_object.find('.select-feed-wall').val();
 	$.ajax({
 		type : 'POST',
-		url : '/feeds/new',
+		url : '/vk/feeds/new',
 		data : {
 			url : rssUrl,
-			frequency : rssFrequency
+			frequency : rssFrequency,
+			wall: rssWall
 		}
 	}).done(function(id){
 		if (id == '0') {
@@ -202,12 +205,27 @@ function saveNewFeed(feed_object) {
 			url_input.tooltip('show');			
 		} else {
 			feed_object.attr('id', 'feed-' + id);
-			makeFeedText(feed_object);
+			vkMakeFeedText(feed_object);
 		}
 	}).fail(function(){
 		$('#add_rss_error').removeClass('hidden');
 		$('#add_rss_error').html('Unknown Server Error');
 	});	
+}
+
+function vkLoadGroups() {
+
+	$.ajax({
+		type : 'GET',
+		url : '/vk/groups',
+		dataType: 'json'
+	}).done(function(response){
+		groups = response;
+	}).fail(function(){
+		$('#add_rss_error').removeClass('hidden');		
+		$('#add_rss_error').html('Error loading groups');
+	});	
+	
 }
 
 !function($) {
@@ -216,11 +234,14 @@ function saveNewFeed(feed_object) {
 		
 		$.ajaxSetup({ cache: false });
 		
-		$('button#add_rss_url').click(function() {
+		$('button#vk_add_rss_url').click(function() {
 			var feed_tr = '';
 			feed_tr = feed_tr + '<tr class="info">';
 			feed_tr = feed_tr + '<td class="feed-url">';
 			feed_tr = feed_tr + '<input class="input-feed-url" type="text" value="http://" />';
+			feed_tr = feed_tr + '</td>';
+			feed_tr = feed_tr + '<td class="feed-wall">';
+			feed_tr = feed_tr + '<input class="input-feed-wall" type="text" value="" />';			
 			feed_tr = feed_tr + '</td>';
 			feed_tr = feed_tr + '<td class="feed-frequency">';
 
@@ -233,7 +254,6 @@ function saveNewFeed(feed_object) {
 			frequency_select = frequency_select + '<option value="2">2 hours</option>';
 			frequency_select = frequency_select + '<option value="1">1 hour</option>';
 			frequency_select = frequency_select + '</select>';			
-			
 			feed_tr = feed_tr + frequency_select;
 			
 			feed_tr = feed_tr + '</td>';			
@@ -250,7 +270,7 @@ function saveNewFeed(feed_object) {
 
 			var feed_object = $(feed_tr);
 			feed_object.find(".feed-save").click(function(){
-				saveNewFeed($(this).parent().parent());
+				vkSaveNewFeed($(this).parent().parent());
 			});
 
 			feed_object.find(".feed-cancel").click(function(){
@@ -260,9 +280,21 @@ function saveNewFeed(feed_object) {
 		});
 		
 		// init
-		if ($('#add_rss_url').length) {
-			loadRssFeeds();
+		if ($('#vk_add_rss_url').length) {
+			vkLoadGroups();
+			vkLoadRssFeeds();
 		}
+		
+		if ($('a#vk-callback-button').length) {
+			$('a#vk-callback-button').click(function(){
+				if ($('input#vk-callback-url').val()) {
+					var callbackUrl = $('input#vk-callback-url').val();
+					var callbackUrlParts = callbackUrl.split("#");
+					window.location.href = "/vk/oauth?" + callbackUrlParts[1];
+				}
+			});
+		}
+		
 		
 	});
 

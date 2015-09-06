@@ -41,3 +41,21 @@ CREATE TABLE IF NOT EXISTS twitter_friend (
 	primary key (screen_name, friend_screen_name)
 ) ENGINE=InnoDB;
 
+
+CREATE TABLE IF NOT EXISTS vk_account (
+	user_id VARCHAR(30) NOT NULL PRIMARY KEY,
+	access_token VARCHAR(255)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS vk_rss_feed (
+	id INT auto_increment PRIMARY KEY, 
+	user_id VARCHAR(30),
+	wall_screen_name VARCHAR(30),
+	url VARCHAR(255),
+	frequency INT,
+	status INT DEFAULT 0,
+	error_text TEXT,	
+	updated BIGINT DEFAULT 0	
+) ENGINE=InnoDB;
+
+

@@ -1,4 +1,4 @@
-package com.euromoby.r2t.web;
+package com.euromoby.r2t.web.twitter;
 
 import java.util.List;
 
@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.euromoby.r2t.core.twitter.TwitterManager;
 import com.euromoby.r2t.core.twitter.model.TwitterRssFeed;
+import com.euromoby.r2t.web.Session;
 import com.euromoby.r2t.web.exception.BadRequestException;
 import com.euromoby.r2t.web.exception.ResourceNotFoundException;
-import com.euromoby.r2t.web.model.RssFeed;
+import com.euromoby.r2t.web.model.TwitterRssFeedDto;
 
 @Controller
-public class AjaxController {
+public class TwitterAjaxController {
 
 	@Autowired
 	private TwitterManager twitterManager;
@@ -40,7 +41,7 @@ public class AjaxController {
 
 	@RequestMapping(value = "/feeds/new", method = RequestMethod.POST)
 	public @ResponseBody
-	Integer newFeed(@Valid @ModelAttribute("rss_feed") RssFeed rssFeed, BindingResult result, ModelMap model) {
+	Integer newFeed(@Valid @ModelAttribute("rss_feed") TwitterRssFeed rssFeed, BindingResult result, ModelMap model) {
 		if (session.isNotAuthenticated() || result.hasErrors()) {
 			throw new BadRequestException();
 		}
@@ -74,7 +75,7 @@ public class AjaxController {
 
 	@RequestMapping(value = "/feeds/{id}/edit", method = RequestMethod.POST)
 	public @ResponseBody
-	Integer editFeed(@Valid @ModelAttribute("rss_feed") RssFeed rssFeed, BindingResult result, @PathVariable("id") Integer id, ModelMap model) {
+	Integer editFeed(@Valid @ModelAttribute("rss_feed") TwitterRssFeed rssFeed, BindingResult result, @PathVariable("id") Integer id, ModelMap model) {
 		if (session.isNotAuthenticated() || result.hasErrors()) {
 			throw new BadRequestException();
 		}
